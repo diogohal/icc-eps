@@ -9,6 +9,9 @@
 struct intervalo {
     float min;
     float max;
+    float erro_absoluto;
+    float erro_relativo;
+    float ulp;
 };
 typedef struct intervalo intervalo_t;
 
@@ -70,105 +73,45 @@ intervalo_t performOperation(intervalo_t a, char operator, intervalo_t b) {
             result = divisao(a, b);
             break;
     }
+    result.erro_absoluto = result.max-result.min;
+    result.erro_relativo = (result.max-result.min)/result.min;
     return result;
 }
 
-// void calcula(float num1, float num2, char op) {
-//     printf("======= %1.8e %c %1.8e =======\n", num1, op, num2);
-//     float num1_next = nextafterf(num1, INFINITY);
-//     float num1_before = nextafterf(num1, -INFINITY);
-//     printf("%1.9e   %1.9e\n", num1_next, num1_before);
-
-//     float num2_next = nextafterf(num2, INFINITY);
-//     float num2_before = nextafterf(num2, -INFINITY);
-//     printf("%1.9e   %1.9e\n", num2_next, num2_before);
-
-//     if (op == '+') {
-//         float sum_minor = num1_before + num2_before;
-//         float sum_max = num1_next + num2_next;
-//         printf("Intervalo = [%1.9e, %1.9e]\n", sum_minor, sum_max);
-//     } else if (op == '-') {
-//         float sub_minor = num1_before - num2_before;
-//         float sub_max = num1_next - num2_next;
-//         printf("Intervalo = [%1.9e, %1.9e]\n", sub_minor, sub_max);
-
-//     } else if (op == '*') {
-//         // float multi[4] = {num1_before * num2_before, num1_before *
-//         num2_next,
-//         // num1_next * num2_before, num1_next * num2_next}; float menor =
-//         // multi[0]; float maior = multi[0]; printf("%1.8e\n", num1_before *
-//         // num2_before); printf("%1.8e\n", num1_before * num2_next);
-//         // printf("%1.8e\n", num1_next * num2_before);
-//         // printf("%1.8e\n", num1_next * num2_next);
-//         // for(int i = 1; i < 4; i++){
-//         //     printf("MULTI: %1.8e\n", multi[i]);
-//         //     if (menor > multi[i])
-//         //         menor = multi[i];
-//         //     if (maior < multi[i])
-//         //         maior = multi[i];
-//         // }
-//         // printf(%)
-//         printf("%1.8e\n",
-//                nextafterf(num1, -INFINITY) * nextafterf(num2, -INFINITY));
-//         printf("%1.8e\n",
-//                nextafterf(num1, INFINITY) * nextafterf(num2, -INFINITY));
-//         fesetround(FE_DOWNWARD);
-//         float menor =
-//             fminf(fminf(num1_before * num2_before, num1_before * num2_next),
-//                   fminf(num1_next * num2_before, num1_next * num2_next));
-//         fesetround(FE_UPWARD);
-//         float maior =
-//             fmaxf(fmaxf(num1_before * num2_before, num1_before * num2_next),
-//                   fmaxf(num1_next * num2_before, num1_next * num2_next));
-//         // resultado.min = min_intervalo(resultado.min);
-//         // resultado.max = max_intervalo(resultado.max);
-
-//         printf("Intervalo = [%1.8e, %1.8e]\n", menor, maior);
-//         // printf("Intervalo = [%1.8le, %1.8le]\n", nextafterf(menor,
-//         // -INFINITY), nextafterf(maior, INFINITY));
-//     }
-// }
-
 int main() {
-    // float teste = 2.347e-40;
-    // float teste2 = 0.001;
-    // calcula(teste, teste2, '*');
 
     float x1, x2, x3, x4, x5;
-    char o1, o2, o3, o4;
+    char op[4];
 
-    intervalo_t i1, i2, i3, i4, i5, result;
+    intervalo_t result, result_aux;
+    intervalo_t intervalos[5];
 
-    // // printf("Digite a expressão no formato X1 O1 X2 O2 X3 O3 X4 O4 X5: ");
-    scanf("%f %c %f %c %f %c %f %c %f", &x1, &o1, &x2, &o2, &x3, &o3, &x4, &o4,
+    scanf("%f %c %f %c %f %c %f %c %f", &x1, &op[0], &x2, &op[1], &x3, &op[2], &x4, &op[3],
           &x5);
-    // scanf("%f %c %f ", &x1, &o1, &x2);
 
-    i1.min = nextafterf(x1, -INFINITY);
-    i1.max = nextafterf(x1, INFINITY);
+    intervalos[0].min = nextafterf(x1, -INFINITY);
+    intervalos[0].max = x1;
 
-    i2.min = nextafterf(x2, -INFINITY);
-    i2.max = nextafterf(x2, INFINITY);
+    intervalos[1].min = nextafterf(x2, -INFINITY);
+    intervalos[1].max = x2;
 
-    i3.min = nextafterf(x3, -INFINITY);
-    i3.max = nextafterf(x3, INFINITY);
+    intervalos[2].min = nextafterf(x3, -INFINITY);
+    intervalos[2].max = x3;
 
-    i4.min = nextafterf(x4, -INFINITY);
-    i4.max = nextafterf(x4, INFINITY);
+    intervalos[3].min = nextafterf(x4, -INFINITY);
+    intervalos[3].max = x4;
 
-    i5.min = nextafterf(x5, -INFINITY);
-    i5.max = nextafterf(x5, INFINITY);
-    // x1.max = x1.min;
-    // x2.max = x2.min;
-    // x3.max = x3.min;
-    // x4.max = x4.min;
-    // x5.max = x5.min;
+    intervalos[4].min = nextafterf(x5, -INFINITY);
+    intervalos[4].max = x5;
 
-    result = performOperation(performOperation(performOperation(performOperation(i1, o1, i2), o2, i3), o3, i4), o4, i5); 
-    // result = performOperation(i1, o1, i2);
-    // result = performOperation(performOperation(i1, o1, i2), o2, i3);
-    // result = performOperation(performOperation(performOperation(i1, o1, i2), o2, i3), o3, i4);
-    printf("Resultado: [%1.8e, %1.8e]\n", result.min, result.max);
-
+    printf("======= RESULTADOS =======\n");
+    result = intervalos[0];
+    for(int i=0; i<4; i++) {
+        result_aux = result;
+        result = performOperation(result, op[i], intervalos[i+1]);
+        printf("%d:\n", i+1);
+        printf("[%1.8e, %1.8e] %c [%1.8e, %1.8e] = [%1.8e, %1.8e]\n", result_aux.min, result_aux.max, op[i], intervalos[i+1].min, intervalos[i+1].max, result.min, result.max);
+        printf("EA: %1.8e; ER: %1.8e; ULP:\n\n", result.erro_absoluto, result.erro_relativo);
+    }
     return 0;
 }
