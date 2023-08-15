@@ -25,14 +25,18 @@ intervalo_t multiplica(intervalo_t inter1, intervalo_t inter2) {
 
 intervalo_t soma(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
+    fesetround(FE_DOWNWARD);
     res.min = inter1.min + inter2.min;
+    fesetround(FE_UPWARD);
     res.max = inter1.max + inter2.max;
     return res;
 }
 
 intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
+    fesetround(FE_DOWNWARD);
     res.min = inter1.min - inter2.min;
+    fesetround(FE_UPWARD);
     res.max = inter1.max - inter2.max;
     return res;
 }
@@ -130,20 +134,40 @@ int main() {
     // float teste2 = 0.001;
     // calcula(teste, teste2, '*');
 
-    intervalo_t result, x1, x2, x3, x4, x5;
+    float x1, x2, x3, x4, x5;
     char o1, o2, o3, o4;
 
-    printf("Digite a expressão no formato X1 O1 X2 O2 X3 O3 X4 O4 X5: ");
-    scanf("%f %c %f %c %f %c %f %c %f", &x1.min, &o1, &x2.min, &o2, &x3.min, &o3, &x4.min, &o4, &x5.min);
+    intervalo_t i1, i2, i3, i4, i5, result;
 
-    x1.max = x1.min;
-    x2.max = x2.min;
-    x3.max = x3.min;
-    x4.max = x4.min;
-    x5.max = x5.min;
+    // // printf("Digite a expressão no formato X1 O1 X2 O2 X3 O3 X4 O4 X5: ");
+    scanf("%f %c %f %c %f %c %f %c %f", &x1, &o1, &x2, &o2, &x3, &o3, &x4, &o4,
+          &x5);
+    // scanf("%f %c %f ", &x1, &o1, &x2);
 
-    result = performOperation(performOperation(performOperation(performOperation(x1, o1, x2), o2, x3), o3, x4), o4, x5);
+    i1.min = nextafterf(x1, -INFINITY);
+    i1.max = nextafterf(x1, INFINITY);
 
+    i2.min = nextafterf(x2, -INFINITY);
+    i2.max = nextafterf(x2, INFINITY);
+
+    i3.min = nextafterf(x3, -INFINITY);
+    i3.max = nextafterf(x3, INFINITY);
+
+    i4.min = nextafterf(x4, -INFINITY);
+    i4.max = nextafterf(x4, INFINITY);
+
+    i5.min = nextafterf(x5, -INFINITY);
+    i5.max = nextafterf(x5, INFINITY);
+    // x1.max = x1.min;
+    // x2.max = x2.min;
+    // x3.max = x3.min;
+    // x4.max = x4.min;
+    // x5.max = x5.min;
+
+    result = performOperation(performOperation(performOperation(performOperation(i1, o1, i2), o2, i3), o3, i4), o4, i5); 
+    // result = performOperation(i1, o1, i2);
+    // result = performOperation(performOperation(i1, o1, i2), o2, i3);
+    // result = performOperation(performOperation(performOperation(i1, o1, i2), o2, i3), o3, i4);
     printf("Resultado: [%1.8e, %1.8e]\n", result.min, result.max);
 
     return 0;
