@@ -89,6 +89,7 @@ int main() {
     scanf("%f %c %f %c %f %c %f %c %f", &x1, &op[0], &x2, &op[1], &x3, &op[2], &x4, &op[3],
           &x5);
 
+    fesetround(FE_DOWNWARD); // Garante que o arredondamento é para cima
     intervalos[0].min = nextafterf(x1, -INFINITY);
     intervalos[0].max = x1;
 
@@ -104,14 +105,25 @@ int main() {
     intervalos[4].min = nextafterf(x5, -INFINITY);
     intervalos[4].max = x5;
 
+    // 2.347e-40 * 0.001 + 1.1e+10 - 0.75e-39 / 0.0
+
     printf("======= RESULTADOS =======\n");
     result = intervalos[0];
+    int ulp = 0;
+    float aux = 0.0;
     for(int i=0; i<4; i++) {
+        ulp = 0;
         result_aux = result;
         result = performOperation(result, op[i], intervalos[i+1]);
         printf("%d:\n", i+1);
         printf("[%1.8e, %1.8e] %c [%1.8e, %1.8e] = [%1.8e, %1.8e]\n", result_aux.min, result_aux.max, op[i], intervalos[i+1].min, intervalos[i+1].max, result.min, result.max);
-        printf("EA: %1.8e; ER: %1.8e; ULP:\n\n", result.erro_absoluto, result.erro_relativo);
+        printf("EA: %1.8e; ER: %1.8e; ULP: ", result.erro_absoluto, result.erro_relativo);
+        aux = nextafterf(result.min, INFINITY);
+        while(aux < result.max && !isinf(result.erro_absoluto)) {
+            ulp++;
+            aux = nextafterf(aux, INFINITY);
+        }
+        printf("%d\n\n", ulp);
     }
     return 0;
 }
