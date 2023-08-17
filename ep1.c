@@ -116,7 +116,7 @@ int main() {
         result_aux = result;
         result = performOperation(result, op[i], intervalos[i+1]);
         printf("%d:\n", i+1);
-        printf("[%1.8e, %1.8e] %c [%1.8e, %1.8e] = [%1.8e, %1.8e]\n", result_aux.min, result_aux.max, op[i], intervalos[i+1].min, intervalos[i+1].max, result.min, result.max);
+        printf("[%1.8e, %1.8e] %c [%1.8e, %1.8e] = \n[%1.8e, %1.8e]\n", result_aux.min, result_aux.max, op[i], intervalos[i+1].min, intervalos[i+1].max, result.min, result.max);
         printf("EA: %1.8e; ER: %1.8e; ULP: ", result.erro_absoluto, result.erro_relativo);
         aux = nextafterf(result.min, INFINITY);
         while(aux < result.max && !isinf(result.erro_absoluto)) {
