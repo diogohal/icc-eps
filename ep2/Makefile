@@ -4,10 +4,10 @@ all: perfEG.o matriz.o
 	gcc $(CFLAGS) perfEG.o matriz.o -o perfEG
 
 matriz.o: matriz.c
-	gcc $(CFLAGS) matriz.c -c matriz.o
+	gcc $(CFLAGS) -c matriz.c
 
 perfEG.o: perfEG.c
-	gcc $(CFLAGS) perfEG.c -c perfEG.o
+	gcc $(CFLAGS) -c perfEG.c
 
 run: all
 	./perfEG
