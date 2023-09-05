@@ -37,7 +37,7 @@ int main() {
     */
 
     printf("===== ELIMINAÇÃO DE GAUSS =====\n");
-    eliminacaoGauss(matriz);
+    eliminacaoGaussSemMultiplicador(matriz);
 
     printf("===== SOLUÇÕES =====\n");
     retrossubs(matriz);

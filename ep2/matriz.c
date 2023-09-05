@@ -165,6 +165,27 @@ void eliminacaoGauss(matriz_t *matriz) {
         }
     }
 }
+// Aplica o método da eliminação gaussiana sem o multiplicador
+void eliminacaoGaussSemMultiplicador(matriz_t *matriz) {
+    double m = 0;
+    int iMax = 0;
+    // Para cada linha
+    for(int i=0; i<matriz->tam; i++) {
+        printaMatriz(matriz);
+        printf("\n");
+        pivoteamentoParcial(matriz, i);
+        printaMatriz(matriz);
+        printf("\n");
+        // Para cada linha subsequente 
+        for(int k=i+1; k<matriz->tam; k++) {
+            // Para cada coluna da linha subsequente
+            for(int j=i+1; j<matriz->tam; j++)
+                matriz->A[k][j] = matriz->A[k][j]*matriz->A[i][i] - matriz->A[i][j]*matriz->A[k][i];
+            matriz->B[k] = matriz->B[k]*matriz->A[i][i] - matriz->A[k][i]*matriz->B[i];
+	    matriz->A[k][i] = 0;
+        }
+    }
+}
 
 // Calcula o resíduo de uma matriz
 void calculaResiduo(matriz_t *matriz) {
