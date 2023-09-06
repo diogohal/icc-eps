@@ -20,6 +20,7 @@ void printaMatriz(matriz_t *matriz);
 void retrossubs(matriz_t *matriz);
 void eliminacaoGauss(matriz_t *matriz);
 void eliminacaoGaussSemMultiplicador(matriz_t *matriz);
+void eliminacaoGaussSemPivoteamento(matriz_t *matriz);
 void calculaResiduo(matriz_t *matriz);
 
 #endif

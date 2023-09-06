@@ -187,6 +187,36 @@ void eliminacaoGaussSemMultiplicador(matriz_t *matriz) {
     }
 }
 
+// Divide a linha do pivô pelo próprio pivô
+void divisaoPivo(matriz_t *matriz, int indice) {
+    double pivo = matriz->A[indice][indice];
+    for(int j=indice; j<matriz->tam; j++)
+        matriz->A[indice][j] /= pivo; 
+    matriz->B[indice] /= pivo;
+}
+
+// Aplica o método da eliminação gaussiana sem o multiplicador
+void eliminacaoGaussSemPivoteamento(matriz_t *matriz) {
+    double m = 0;
+    // Para cada linha
+    for(int i=0; i<matriz->tam; i++) {
+        printaMatriz(matriz);
+        printf("\n");
+        divisaoPivo(matriz, i);
+        printaMatriz(matriz);
+        printf("\n");
+        // Para cada linha subsequente 
+        for(int k=i+1; k<matriz->tam; k++) {
+            m = matriz->A[k][i] / matriz->A[i][i];   // m retirado da fórmula para evitar divisões
+            matriz->A[k][i] = 0;
+            // Para cada coluna da linha subsequente
+            for(int j=i+1; j<matriz->tam; j++)
+                matriz->A[k][j] -= m*matriz->A[i][j];
+            matriz->B[k] -= m*matriz->B[i];
+        }
+    }
+}
+
 // Calcula o resíduo de uma matriz
 void calculaResiduo(matriz_t *matriz) {
     double valor = 0;
