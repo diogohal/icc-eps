@@ -2,10 +2,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include "matriz.h"
+#include "likwid.h"
 #define N 3
 
 int main() {
 
+    LIKWID_MARKER_INIT;
     int tam = 0;
     int returnScanf = 0;
     returnScanf = scanf("%d", &tam);
@@ -37,7 +39,10 @@ int main() {
     */
 
     printf("===== ELIMINAÇÃO DE GAUSS =====\n");
+    
+    LIKWID_MARKER_START("marker-name");
     eliminacaoGaussSemPivoteamento(matriz);
+    LIKWID_MARKER_STOP("marker-name");
 
     printf("===== SOLUÇÕES =====\n");
     retrossubs(matriz);
@@ -54,5 +59,5 @@ int main() {
         printf("%f ", matriz->residuo[i]);
     }
     printf("\n");
-    
+    LIKWID_MARKER_CLOSE;
 }
