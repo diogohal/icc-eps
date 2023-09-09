@@ -6,8 +6,8 @@
 #define N 3
 
 int main() {
-
     LIKWID_MARKER_INIT;
+    
     int tam = 0;
     int returnScanf = 0;
     returnScanf = scanf("%d", &tam);
@@ -39,10 +39,11 @@ int main() {
     */
 
     printf("===== ELIMINAÇÃO DE GAUSS =====\n");
-    
+
     LIKWID_MARKER_START("marker-name");
     eliminacaoGaussSemPivoteamento(matriz);
     LIKWID_MARKER_STOP("marker-name");
+    
 
     printf("===== SOLUÇÕES =====\n");
     retrossubs(matriz);
