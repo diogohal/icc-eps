@@ -1,4 +1,4 @@
-CFLAGS = -mavx -march=native
+CFLAGS = -O3 -mavx -march=native
 
 all: perfEG.o matriz.o
 	gcc -o perfEG matriz.o perfEG.o -L${LIKWID_LIB} -llikwid $(CFLAGS)

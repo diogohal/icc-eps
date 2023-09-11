@@ -15,7 +15,7 @@ likwid-perfctr -C 3 -g FLOPS_DP -m ./perfEG < teste.txt > temp_output.txt
 # Verifique se a execução foi bem-sucedida
 if [ $? -eq 0 ]; then
     # Use grep e awk para extrair a quantidade de MFLOPS da saída
-    mflops=$(grep "DP MFLOP/s" temp_output.txt | awk 'NR==2{print $3}')
+    mflops=$(grep "DP MFLOP/s" temp_output.txt | head -n 1)
     echo "Quantidade de MFLOPS: $mflops MFLOP/s"
 else
     echo "Erro ao executar o programa perfEG"

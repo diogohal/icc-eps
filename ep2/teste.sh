@@ -10,11 +10,21 @@ echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 make all
 
 # Execute o programa perfEG com LIKWID e capture a saída
-likwid-perfctr -C 3 -g FLOPS_DP -m ./perfEG < teste.txt
+likwid-perfctr -C 3 -g FLOPS_DP -m ./perfEG < teste.txt > saida.txt
+cat saida.txt | head -n 8 | tail -n 3
+cat saida.txt | grep MFLOP/s | head -n 1
+
+cat saida.txt | head -n 12 | tail -n 4
+cat saida.txt | grep MFLOP/s | head -n 4 | tail -n -1
+
+cat saida.txt | head -n 16 | tail -n 4
+cat saida.txt | grep MFLOP/s | head -n 7 | tail -n -1
+
 
 # Verifique se a execução foi bem-sucedida
 if [ $? -eq 0 ]; then
-    echo "Execução bem-sucedida"
+   rm -rf saida.txt
+   echo "Execução bem-sucedida"
 else
     echo "Erro ao executar o programa perfEG"
 fi

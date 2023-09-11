@@ -149,11 +149,7 @@ void eliminacaoGauss(matriz_t *matriz) {
     int iMax = 0;
     // Para cada linha
     for(int i=0; i<matriz->tam; i++) {
-        printaMatriz(matriz);
-        printf("\n");
         pivoteamentoParcial(matriz, i);
-        printaMatriz(matriz);
-        printf("\n");
         // Para cada linha subsequente 
         for(int k=i+1; k<matriz->tam; k++) {
             m = matriz->A[k][i] / matriz->A[i][i];   // m retirado da fórmula para evitar divisões
@@ -171,11 +167,7 @@ void eliminacaoGaussSemMultiplicador(matriz_t *matriz) {
     int iMax = 0;
     // Para cada linha
     for(int i=0; i<matriz->tam; i++) {
-        printaMatriz(matriz);
-        printf("\n");
         pivoteamentoParcial(matriz, i);
-        printaMatriz(matriz);
-        printf("\n");
         // Para cada linha subsequente 
         for(int k=i+1; k<matriz->tam; k++) {
             // Para cada coluna da linha subsequente
@@ -195,16 +187,12 @@ void divisaoPivo(matriz_t *matriz, int indice) {
     matriz->B[indice] /= pivo;
 }
 
-// Aplica o método da eliminação gaussiana sem o multiplicador
+// AplicIa o método da eliminação gaussiana sem o multiplicador
 void eliminacaoGaussSemPivoteamento(matriz_t *matriz) {
     double m = 0;
     // Para cada linha
     for(int i=0; i<matriz->tam; i++) {
-        printaMatriz(matriz);
-        printf("\n");
         divisaoPivo(matriz, i);
-        printaMatriz(matriz);
-        printf("\n");
         // Para cada linha subsequente 
         for(int k=i+1; k<matriz->tam; k++) {
             m = matriz->A[k][i] / matriz->A[i][i];   // m retirado da fórmula para evitar divisões
@@ -227,4 +215,26 @@ void calculaResiduo(matriz_t *matriz) {
         matriz->residuo[i] = valor - matriz->B[i];
         valor = 0;
     }
+}
+
+void copiaMatriz(matriz_t *m1, matriz_t *m2) {
+    for(int i=0; i<m1->tam; i++) {
+        for(int j=0; j<m1->tam; j++) {
+	    m2->A[i][j] = m1->A[i][j];
+	}
+	m2->B[i] = m1->B[i];
+	m2->X[i] = m1->B[i];
+	m2->residuo[i] = m1->residuo[i];
+    }
+}
+
+void libera(matriz_t *matriz) {
+    for(int i=0; i<matriz->tam; i++){
+	free(matriz->A[i]);
+    }
+    free(matriz->A);
+    free(matriz->B);
+    free(matriz->X);
+    free(matriz->residuo);
+    free(matriz);
 }
