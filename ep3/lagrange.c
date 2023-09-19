@@ -20,11 +20,14 @@ float lagrange(float x, int n, float *x_values, float *y_values) {
 float *calculate_differences(int n, float *x_values, float *y_values, float *differences) {
     for (int j = 1; j < n; j++) {
         for (int i = n - 1; i >= j; i--) {
+            printf("\n%f %f\n", differences[i], differences[i-1]);
+            printf("\nNumerador: %f\n", differences[i] - differences[i - 1]);
+            printf("\nDivisor: %f\n", x_values[i] - x_values[i - j]);
             differences[i] = (differences[i] - differences[i - 1]) /
                              (x_values[i] - x_values[i - j]);
            
         }
-        printf("\nDiferenca %d: %f", j, differences[j]);
+        printf("\nDiferenca %d: %f\n==================================================\n", j, differences[j]);
     }
     return differences;
 }
@@ -37,10 +40,14 @@ float newton(float x, int n, float *x_values, float *y_values) {
     }
 
     for (int i = 0; i < n; i++) {
+        printf("\ny_values: %f", y_values[i]);
         differences[i] = y_values[i];
     }
 
     calculate_differences(n, x_values, y_values, differences);
+    for(int i = 0; i < n; i++){
+        printf("\nd[%d] = %f\n", i, differences[i]);
+    }
     float result = differences[0];
     float term = 1.0;
 
@@ -56,7 +63,7 @@ float newton(float x, int n, float *x_values, float *y_values) {
 
 int main() {
     float x_values[4] = {20, 25, 30, 35};
-    float y_values[4] = {0.991, 0.9985, 0.9983, 0.9982};
+    float y_values[4] = {0.9991, 0.9985, 0.9983, 0.9982};
     float result = lagrange(2.5, 4, x_values, y_values);
     float result2 = newton(2.5, 4, x_values, y_values);
     printf("\nRESULT = %f\n", result);
