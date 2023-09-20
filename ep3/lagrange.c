@@ -1,72 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-float lagrange(float x, int n, float *x_values, float *y_values) {
-    float result = 0.0;
+float lagrange(float xe, int n, float *x, float *y) {
+    float resultado = 0.0;
 
     for (int i = 0; i < n; i++) {
-        float term = y_values[i];
+        float mult = y[i];
         for (int j = 0; j < n; j++) {
             if (j != i) {
-                term *= (x - x_values[j]) / (x_values[i] - x_values[j]);
+                mult *= (xe - x[j]) / (x[i] - x[j]);
             }
         }
-        result += term;
+        resultado += mult;
     }
 
-    return result;
+    return resultado;
 }
 
-float *calculate_differences(int n, float *x_values, float *y_values, float *differences) {
+float *calcular_d(int n, float *x, float *y, float *diff) {
     for (int j = 1; j < n; j++) {
         for (int i = n - 1; i >= j; i--) {
-            printf("\n%f %f\n", differences[i], differences[i-1]);
-            printf("\nNumerador: %f\n", differences[i] - differences[i - 1]);
-            printf("\nDivisor: %f\n", x_values[i] - x_values[i - j]);
-            differences[i] = (differences[i] - differences[i - 1]) /
-                             (x_values[i] - x_values[i - j]);
+            diff[i] = (diff[i] - diff[i - 1]) /
+                             (x[i] - x[i - j]);
            
         }
-        printf("\nDiferenca %d: %f\n==================================================\n", j, differences[j]);
     }
-    return differences;
+    return diff;
 }
 
-float newton(float x, int n, float *x_values, float *y_values) {
-    float *differences = malloc(n * sizeof(float));
-    if (differences == NULL) {
+float newton(float xe, int n, float *x, float *y) {
+    float *diff = malloc(n * sizeof(float));
+    if (diff == NULL) {
         perror("Erro ao alocar memória");
         exit(1);
     }
 
     for (int i = 0; i < n; i++) {
-        printf("\ny_values: %f", y_values[i]);
-        differences[i] = y_values[i];
+        diff[i] = y[i];
     }
 
-    calculate_differences(n, x_values, y_values, differences);
-    for(int i = 0; i < n; i++){
-        printf("\nd[%d] = %f\n", i, differences[i]);
-    }
-    float result = differences[0];
-    float term = 1.0;
+    calcular_d(n, x, y, diff);
+    
+    float resultado = diff[0];
+    float mult = 1.0;
 
     for (int i = 1; i < n; i++) {
-        term *= (x - x_values[i - 1]);
-        result += differences[i] * term;
-        printf("\nTermo: %f", result);
+        mult *= (xe - x[i - 1]);
+        resultado += diff[i] * mult;
     }
-    free(differences); 
+    free(diff); 
 
-    return result;
+    return resultado;
 }
 
-int main() {
-    float x_values[4] = {20, 25, 30, 35};
-    float y_values[4] = {0.9991, 0.9985, 0.9983, 0.9982};
-    float result = lagrange(2.5, 4, x_values, y_values);
-    float result2 = newton(2.5, 4, x_values, y_values);
-    printf("\nRESULT = %f\n", result);
-    printf("RESULT 2 = %f\n", result2);
+int main(int argc, char** argv) {
+    int n;
+    float xe;
+    scanf("%d", &n);
+    float x[n];
+    float y[n];
+
+    xe = atoi(argv[1]);
+
+    for(int i = 0; i < n; i++){
+        scanf("%f %f", &x[i], &y[i]);
+    }
+    // float x[4] = {20, 25, 30, 35};
+    // float y[4] = {0.9991, 0.9985, 0.9983, 0.9982};
+    float resultado = lagrange(xe, n, x, y);
+    float resultado2 = newton(xe, n, x, y);
+    printf("\nresultado = %f\n", resultado);
+    printf("resultado 2 = %f\n", resultado2);
     return 0;
 }
