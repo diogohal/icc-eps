@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
     return_scanf = fscanf(stdin, "%d", &n); // Lê quantidade de pontos
     tabela_h *tabela = cria_tabela(n);
     le_pontos(tabela);
-    imprime_pontos(tabela);
+    // imprime_pontos(tabela);
 
     // Calcula e imprime resultados
     LIKWID_MARKER_START("lagrange");
@@ -97,5 +97,6 @@ int main(int argc, char** argv) {
     printf("Tempo Lagrange: %.7lf\n", lagrange_time);
     printf("Tempo Newton: %.7lf\n", newton_time);
 
+    LIKWID_MARKER_CLOSE;
     return 0;
 }
