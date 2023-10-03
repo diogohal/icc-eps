@@ -1,11 +1,12 @@
 #ifndef MATRIZ_H
 #define MATRIZ_H
+#include "intervaloOp.h"
 
 typedef struct matriz {
-    double **A;
-    double *B;
-    double *X;
-    double *residuo;
+    intervalo_t **A;
+    intervalo_t *B;
+    intervalo_t *X;
+    intervalo_t *residuo;
     int tam;
 } matriz_t;
 

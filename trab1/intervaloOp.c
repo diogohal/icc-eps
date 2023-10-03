@@ -7,7 +7,6 @@
 #include <string.h>
 #include "intervaloOp.h"
 
-
 intervalo_t multiplica(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
     fesetround(FE_DOWNWARD);
@@ -69,4 +68,13 @@ intervalo_t power(intervalo_t interval, int p) {
         result.max = fmax(pow(interval.min, p), pow(interval.max, p));
     }
     return result;
+}
+
+void transformaIntervalo(intervalo_t *intervalo, double num) {
+    intervalo->min = num;
+    intervalo->max = nextafterf(num, +INFINITY);
+}
+
+void printaIntervalo(intervalo_t* intervalo) {
+    printf("[%1.8e, %1.8e]", intervalo->min, intervalo->max);
 }

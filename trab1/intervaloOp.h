@@ -15,4 +15,6 @@ intervalo_t soma(intervalo_t inter1, intervalo_t inter2);
 intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2);
 intervalo_t divisao(intervalo_t inter1, intervalo_t inter2);
 intervalo_t power(intervalo_t interval, int p);
+void transformaIntervalo(intervalo_t *intervalo, double num);
+void printaIntervalo(intervalo_t* intervalo);
 #endif
