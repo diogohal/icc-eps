@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "matriz.h"
+#include "intervaloOp.h"
 
 struct xy {
     float x;
