@@ -5,17 +5,21 @@
 
 // Cria uma estrutura matriz_t dinamicamente e inicializa os valores com 0
 matriz_t *criaMatriz(int tam) {
+    // printf("aqui");
     matriz_t * matriz = malloc(sizeof(matriz_t));
+    // printf("alocou matriz");
     if(!matriz)
         return NULL;
-
+    // printf("alocou matriz 1\n");
     // Inicializa A
     matriz->A = malloc(sizeof(intervalo_t*)*tam);
     if(!matriz->A)
         return NULL;
+    
+    // printf("alocou matriz 2\n");
 
     for(int i=0; i<tam; i++) {
-        matriz->A[i] = malloc(sizeof(intervalo_t)*tam);
+        matriz->A[i] = malloc(sizeof(intervalo_t*) * tam);
         if(!matriz->A[i])
             return NULL;
     }    
@@ -24,6 +28,7 @@ matriz_t *criaMatriz(int tam) {
             transformaIntervalo(&matriz->A[i][j], 0);
         }
     }
+
 
     // Inicializa B, X e resíduo
     matriz->B = malloc(sizeof(double)*tam);
@@ -233,13 +238,13 @@ void printaMatriz(matriz_t *matriz) {
 //     }
 // }
 
-// void libera(matriz_t *matriz) {
-//     for(int i=0; i<matriz->tam; i++){
-// 	free(matriz->A[i]);
-//     }
-//     free(matriz->A);
-//     free(matriz->B);
-//     free(matriz->X);
-//     free(matriz->residuo);
-//     free(matriz);
-// }
+void libera(matriz_t *matriz) {
+    for(int i=0; i<matriz->tam; i++){
+	    free(matriz->A[i]);
+    }
+    free(matriz->A);
+    free(matriz->B);
+    free(matriz->X);
+    free(matriz->residuo);
+    free(matriz);
+}

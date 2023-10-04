@@ -36,5 +36,10 @@ int main(){
     // libera(SL);
 
     matriz_t *SL = criaMatriz(2);
+     if (!SL) {
+        printf("Falha na alocação de memória.\n");
+        return 1;
+    }
     printaMatriz(SL);
+    libera(SL);
 }
