@@ -4,42 +4,41 @@
 #include "matriz.h"
 #include "intervaloOp.h"
 
-struct xy {
-    double x;
-    double y;
-};
-typedef struct xy xy_t;
+int main(){  
+    int n, k, returnScanf;
+    returnScanf = fscanf(stdin, "%d %d", &n, &k);
 
-// void criaSL(xy_t *xy, matriz_t *SL, int p, int n){
-//     for(int i = 0; i < p+1; i++){
-//         for(int j = 0; j < p+1; j++){
-//             for(int k = 0; k < n; k++)
-//                 SL->A[i][j] += pow(xy[k].x, i) * pow(xy[k].x, j);
-//         }
-//         for(int k = 0; k < n; k++)
-//             SL->B[i] += xy[k].y * pow(xy[k].x, i);
-//     }
-// }
-
-int main(){
-    // int n, k;
-    // fscanf(stdin, "%d %d", &n, &k);
-
-    // xy_t *pontos = malloc(sizeof(xy_t)*n);
+    pontos_t *pontos = malloc(sizeof(pontos_t)*k);
     
-    // for(int i=0; i<n; i++) {
-    //     fscanf(stdin, "%lf %lf", &pontos[i].x, &pontos[i].y);
-    // }
-    
-    // criaSL(pontos, SL, k, n);
-    // printaMatriz(SL);
-    // libera(SL);
-
-    matriz_t *SL = criaMatriz(2);
-     if (!SL) {
-        printf("Falha na alocação de memória.\n");
-        return 1;
+    for(int i=0; i<k; i++) {
+        returnScanf = fscanf(stdin, "%lf %lf", &pontos[i].x, &pontos[i].y);
     }
+    
+    matriz_t *SL = criaMatriz(n+1);
+    criaSL(pontos, SL, k, n);
+    printf("Matriz criada!\n");
     printaMatriz(SL);
-    libera(SL);
+
+    printf("\nEliminação de Gauss!\n");
+    eliminacaoGauss(SL);
+    printaMatriz(SL);
+    retrossubs(SL);
+    
+    printf("\nRespostas!\n");
+    for(int i=0; i<SL->tam; i++) {
+        printf("a%d = ", i);
+        printaIntervalo(&SL->X[i]);
+        printf("\n");
+    }
+
+    intervalo_t* residuo = calculaResiduo(SL, pontos, k);
+    printf("\nResíduos!\n");
+    for(int i=0; i<k; i++) {
+        printf("r%d = ", i);
+        printaIntervalo(&residuo[i]);
+        printf("\n");
+    }
+
+
+    libera(SL, residuo);
 }

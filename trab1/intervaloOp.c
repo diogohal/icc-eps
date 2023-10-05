@@ -37,20 +37,29 @@ intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
 }
 
 intervalo_t divisao(intervalo_t inter1, intervalo_t inter2) {
-    intervalo_t aux;
+    intervalo_t result;
+    double aux;
     if (inter2.min == 0.0 || inter2.max == 0.0) {
-        aux.min = -INFINITY;
-        aux.max = INFINITY;
+        result.min = -INFINITY;
+        result.max = INFINITY;
     } else {
-        aux.min = 1 / inter2.max;
-        aux.max = 1 / inter2.min;
-        aux = multiplica(inter1, aux);
+        result.min = 1 / inter2.max;
+        result.max = 1 / inter2.min;
+        result = multiplica(inter1, result);
     }
-    return aux;
+
+    if(result.max < result.min) {
+        aux = result.min;
+        result.min = result.max;
+        result.max = aux;
+        printf("entrou!\n");
+    }
+    return result;
 }
 
 intervalo_t power(intervalo_t interval, int p) {
     intervalo_t result;
+    double aux = 0;
     if (p == 0) {
         result.min = 1;
         result.max = 1;
@@ -67,11 +76,18 @@ intervalo_t power(intervalo_t interval, int p) {
         result.min = 0;
         result.max = fmax(pow(interval.min, p), pow(interval.max, p));
     }
+
+    if(result.max < result.min) {
+        aux = result.min;
+        result.min = result.max;
+        result.max = aux;
+    }
+
     return result;
 }
 
 void transformaIntervalo(intervalo_t *intervalo, double num) {
-    intervalo->min = num;
+    intervalo->min = nextafterf(num, -INFINITY);
     intervalo->max = nextafterf(num, +INFINITY);
 }
 
