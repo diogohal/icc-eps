@@ -5,7 +5,7 @@
 #include <time.h>
 
 #include "intervaloOp.h"
-// #include "likwid.h"
+#include "likwid.h"
 #include "matriz.h"
 
 double timestamp(void) {
@@ -15,7 +15,7 @@ double timestamp(void) {
 }
 
 int main() {
-    // LIKWID_MARKER_INIT;
+    LIKWID_MARKER_INIT;
     double start, stop, tgeraSL, tsolSL = 0.0;
     int n, k, returnScanf;
     returnScanf = fscanf(stdin, "%d %d", &n, &k);
@@ -28,39 +28,34 @@ int main() {
 
     matriz_t *SL = criaMatriz(n + 1);
     start = timestamp();
-    // LIKWID_MARKER_START("classica");
+    LIKWID_MARKER_START("geraSL");
     criaSL(pontos, SL, k, n);
+    LIKWID_MARKER_STOP("geraSL");
     stop = timestamp();
     tgeraSL = stop - start;
-    printf("Matriz criada!\n");
-    printaMatriz(SL);
 
     start = timestamp();
-    printf("\nEliminação de Gauss!\n");
+    LIKWID_MARKER_START("solSL");
     eliminacaoGauss(SL);
-    printaMatriz(SL);
     retrossubs(SL);
+    LIKWID_MARKER_STOP("solSL");
     stop = timestamp();
     tsolSL = stop - start;
-    printf("\nRespostas!\n");
     for (int i = 0; i < SL->tam; i++) {
-        printf("a%d = ", i);
         printaIntervalo(&SL->X[i]);
-        printf("\n");
+        printf(" ");
     }
+    printf("\n");
 
     intervalo_t *residuo = calculaResiduo(SL, pontos, k);
-    printf("\nResíduos!\n");
     for (int i = 0; i < k; i++) {
-        printf("r%d = ", i);
         printaIntervalo(&residuo[i]);
-        printf("\n");
+        printf(" ");
     }
-    // LIKWID_MARKER_STOP("classica");
 
-    printf("Tempo geraSL = %f\n", tgeraSL);
-    printf("Tempo solSL = %f\n", tsolSL);
-    // LIKWID_MARKER_CLOSE;
+    printf("\n%f\n", tgeraSL);
+    printf("%f\n", tsolSL);
+    LIKWID_MARKER_CLOSE;
 
     libera(SL, residuo);
 }
