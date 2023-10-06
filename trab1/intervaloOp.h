@@ -2,11 +2,11 @@
 #define INTERVALOOP_H
 
 struct intervalo {
-    float min;
-    float max;
-    float erro_absoluto;
-    float erro_relativo;
-    float ulp;
+    double min;
+    double max;
+    double erro_absoluto;
+    double erro_relativo;
+    double ulp;
 };
 typedef struct intervalo intervalo_t;
 

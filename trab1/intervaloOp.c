@@ -10,11 +10,15 @@
 intervalo_t multiplica(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
     fesetround(FE_DOWNWARD);
-    res.min = fminf(fminf(inter1.min * inter2.min, inter1.min * inter2.max),
-                    fminf(inter1.max * inter2.min, inter1.max * inter2.max));
+    res.min = fmin(fmin(inter1.min * inter2.min, inter1.min * inter2.max),
+                    fmin(inter1.max * inter2.min, inter1.max * inter2.max));
     fesetround(FE_UPWARD);
-    res.max = fmaxf(fmaxf(inter1.min * inter2.min, inter1.min * inter2.max),
-                    fmaxf(inter1.max * inter2.min, inter1.max * inter2.max));
+    res.max = fmax(fmax(inter1.min * inter2.min, inter1.min * inter2.max),
+                    fmax(inter1.max * inter2.min, inter1.max * inter2.max));
+    
+    // printf("MULT = ");
+    // printaIntervalo(&res);
+    // printf("\n");
     return res;
 }
 
@@ -24,6 +28,9 @@ intervalo_t soma(intervalo_t inter1, intervalo_t inter2) {
     res.min = inter1.min + inter2.min;
     fesetround(FE_UPWARD);
     res.max = inter1.max + inter2.max;
+    // printf("SOMA = ");
+    // printaIntervalo(&res);
+    // printf("\n");
     return res;
 }
 
@@ -31,14 +38,12 @@ intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
     double aux;
     fesetround(FE_DOWNWARD);
-    res.min = inter1.min - inter2.min;
+    res.min = inter1.min - inter2.max;
     fesetround(FE_UPWARD);
-    res.max = inter1.max - inter2.max;
-    if(res.max < res.min) {
-        aux = res.min;
-        res.min = res.max;
-        res.max = aux;
-    }
+    res.max = inter1.max - inter2.min;
+    // printf("SUB = ");
+    // printaIntervalo(&res);
+    // printf("\n");
     return res;
 }
 
@@ -53,6 +58,9 @@ intervalo_t divisao(intervalo_t inter1, intervalo_t inter2) {
         result.max = 1 / inter2.min;
         result = multiplica(inter1, result);
     }
+    // printf("DIV = ");
+    // printaIntervalo(&result);
+    // printf("\n");
     return result;
 }
 
@@ -76,12 +84,15 @@ intervalo_t power(intervalo_t interval, int p) {
         result.max = fmax(pow(interval.min, p), pow(interval.max, p));
     }
 
+    // printf("POWER = ");
+    // printaIntervalo(&result);
+    // printf("\n");
     return result;
 }
 
 void transformaIntervalo(intervalo_t *intervalo, double num) {
-    intervalo->min = nextafterf(num, -INFINITY);
-    intervalo->max = nextafterf(num, +INFINITY);
+    intervalo->min = nextafter(num, -INFINITY);
+    intervalo->max = nextafter(num, +INFINITY);
 }
 
 void printaIntervalo(intervalo_t* intervalo) {
