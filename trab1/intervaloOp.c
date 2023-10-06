@@ -29,10 +29,16 @@ intervalo_t soma(intervalo_t inter1, intervalo_t inter2) {
 
 intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
+    double aux;
     fesetround(FE_DOWNWARD);
     res.min = inter1.min - inter2.min;
     fesetround(FE_UPWARD);
     res.max = inter1.max - inter2.max;
+    if(res.max < res.min) {
+        aux = res.min;
+        res.min = res.max;
+        res.max = aux;
+    }
     return res;
 }
 
@@ -46,13 +52,6 @@ intervalo_t divisao(intervalo_t inter1, intervalo_t inter2) {
         result.min = 1 / inter2.max;
         result.max = 1 / inter2.min;
         result = multiplica(inter1, result);
-    }
-
-    if(result.max < result.min) {
-        aux = result.min;
-        result.min = result.max;
-        result.max = aux;
-        printf("entrou!\n");
     }
     return result;
 }
@@ -75,12 +74,6 @@ intervalo_t power(intervalo_t interval, int p) {
     } else if (p % 2 == 0 && interval.min < 0 && interval.max >= 0) {
         result.min = 0;
         result.max = fmax(pow(interval.min, p), pow(interval.max, p));
-    }
-
-    if(result.max < result.min) {
-        aux = result.min;
-        result.min = result.max;
-        result.max = aux;
     }
 
     return result;

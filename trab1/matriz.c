@@ -100,8 +100,7 @@ void eliminacaoGauss(matriz_t *matriz) {
     // Para cada linha
     for (int i = 0; i < matriz->tam; i++) {
         pivoteamentoParcial(matriz, i);
-        printaMatriz(matriz);
-        printf("\n");
+        // printaMatriz(matriz);
         // Para cada linha subsequente
         for (int k = i + 1; k < matriz->tam; k++) {
             m = divisao(matriz->A[k][i], matriz->A[i][i]);
