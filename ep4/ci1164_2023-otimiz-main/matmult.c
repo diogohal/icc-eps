@@ -3,8 +3,11 @@
 #include <string.h>
 #include <getopt.h>    /* getopt */
 #include <time.h>
+#include <sys/time.h>
 
 #include "matriz.h"
+// #include "likwid.h"
+
 
 /**
  * Exibe mensagem de erro indicando forma de uso do programa e termina
@@ -15,6 +18,12 @@ static void usage(char *progname)
 {
   fprintf(stderr, "Forma de uso: %s [ <ordem> ] \n", progname);
   exit(1);
+}
+
+double timestamp(void) {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return ((double)(tp.tv_sec + tp.tv_usec / 1000000.0)) * 1000;
 }
 
 
@@ -29,6 +38,7 @@ static void usage(char *progname)
 int main (int argc, char *argv[]) 
 {
   int n=DEF_SIZE;
+  double start, stop, tMatVet, tMatMat;
   
   MatRow mRow_1, mRow_2, resMat;
   Vetor vet, res;
@@ -67,12 +77,20 @@ int main (int argc, char *argv[])
     prnMat (mRow_2, n, n);
     prnVetor (vet, n);
     printf ("=================================\n\n");
-#endif /* _DEBUG_ */
-
+#endif 
+  start = timestamp();
   multMatVet (mRow_1, vet, n, n, res);
-    
+  stop = timestamp();
+  tMatVet = stop - start;
+
+  start = timestamp();
   multMatMat (mRow_1, mRow_2, n, resMat);
-    
+  stop = timestamp();
+  tMatMat = stop - start;
+
+  printf("Tempo matriz vetor: %f\n", tMatVet);
+  printf("Tempo matriz matriz: %f\n", tMatMat);
+
 #ifdef _DEBUG_
     prnVetor (res, n);
     prnMat (resMat, n, n);

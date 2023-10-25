@@ -100,7 +100,7 @@ void liberaVetor(void *vet) { free(vet); }
 void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
     /* Efetua a multiplicação */
     if (res) {
-        for (int i = 0; i < m; i += 4) {
+        for (int i = 0; i < m - (m % 4); i += 4) {
             for (int j = 0; j < n; ++j) {
                 res[i] += mat[n * i + j] * v[j];
                 res[i + 1] += mat[n * (i + 1) + j] * v[j];
@@ -108,8 +108,24 @@ void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
                 res[i + 3] += mat[n * (i + 3) + j] * v[j];
             }
         }
+
+        for (int i = m - (m % 4); i < m; ++i)
+            for (int j=0; j < n; ++j)
+                res[i] += mat[n * i + j] * v[j];
     }
 }
+
+// void multMatVet (MatRow mat, Vetor v, int m, int n, Vetor res)
+// {
+    
+//   /* Efetua a multiplicação */
+//   if (res) {
+//     for (int i=0; i < m; ++i)
+//       for (int j=0; j < n; ++j)
+//         res[i] += mat[n*i + j] * v[j];
+//   }
+// }
+
 
 /**
  *  Funcao multMatMat: Efetua multiplicacao de duas matrizes 'n x n'
