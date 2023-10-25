@@ -6,6 +6,8 @@
 #define DEF_SIZE 128
 #define BASE 32
 
+#define UF 4
+#define BF 2
 
 #define ABS(num)  ((num) < 0.0 ? -(num) : (num))
 

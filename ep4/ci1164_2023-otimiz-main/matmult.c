@@ -27,7 +27,6 @@ double timestamp(void) {
 }
 
 
-
 /**
  * Programa principal
  * Forma de uso: matmult [ -n <ordem> ]

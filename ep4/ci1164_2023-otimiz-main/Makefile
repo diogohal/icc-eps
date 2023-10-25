@@ -25,6 +25,7 @@ debug:         $(PROG)
 $(PROG): $(OBJS) 
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
+
 clean:
 	@echo "Limpando ...."
 	@rm -f *~ *.bak *.tmp core 
