@@ -37,7 +37,7 @@ double timestamp(void) {
 int main (int argc, char *argv[]) 
 {
   int n=DEF_SIZE;
-  double start, stop, tMatVet, tMatMat;
+  double start, stop, tMatVet, tMatMat, tMatMatNaive, tMatMatUnroll;
   
   MatRow mRow_1, mRow_2, resMat;
   Vetor vet, res;
@@ -87,8 +87,20 @@ int main (int argc, char *argv[])
   stop = timestamp();
   tMatMat = stop - start;
 
+  start = timestamp();
+  multMatMatNaive(mRow_1, mRow_2, n, resMat);
+  stop = timestamp();
+  tMatMatNaive = stop - start;
+
+  start = timestamp();
+  multMatMatUnroll(mRow_1, mRow_2, n, resMat);
+  stop = timestamp();
+  tMatMatUnroll = stop - start;
+
   printf("Tempo matriz vetor: %f\n", tMatVet);
-  printf("Tempo matriz matriz: %f\n", tMatMat);
+  printf("Tempo matriz matriz unroll blocking: %f\n", tMatMat);
+  printf("Tempo matriz matriz unroll: %f\n", tMatMatUnroll);
+  printf("Tempo matriz matriz naive: %f\n", tMatMatNaive);
 
 #ifdef _DEBUG_
     prnVetor (res, n);

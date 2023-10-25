@@ -6,8 +6,11 @@
 #define DEF_SIZE 128
 #define BASE 32
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 #define UF 4
-#define BF 2
+#define BF 2048
 
 #define ABS(num)  ((num) < 0.0 ? -(num) : (num))
 
@@ -27,6 +30,8 @@ void liberaVetor (void *vet);
 
 void multMatVet (MatRow mat, Vetor v, int m, int n, Vetor res);
 void multMatMat(MatRow A, MatRow B, int n, MatRow C);
+void multMatMatNaive(MatRow A, MatRow B, int n, MatRow C);
+void multMatMatUnroll(MatRow A, MatRow B, int n, MatRow C); 
 
 void prnMat (MatRow mat, int m, int n);
 void prnVetor (Vetor vet, int n);

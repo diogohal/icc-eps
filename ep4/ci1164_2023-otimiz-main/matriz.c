@@ -139,15 +139,48 @@ void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
 
 void multMatMat(MatRow A, MatRow B, int n, MatRow C) {
     /* COM BLOCKING */
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j)
-            for (int k = 0; k < n; ++k)
-                C[i * n + j] += A[i * n + k] * B[k * n + j];
+    // Tem alguma coisa errada erradinha nao funciona mt bem
+    for(int ii=0; ii<n; ii+=BF)
+        for(int jj=0; jj<n; jj+=BF)
+            for(int kk=0; kk<n; kk+=BF)
+                for (int i = 0; i < MIN(ii+BF, n); ++i)
+                    for (int j = 0; j < MIN(jj+BF, n); j+=UF) {
+                        C[i * n + j] = 0.0;
+                        C[i * n + j+1] = 0.0;
+                        C[i * n + j+2] = 0.0;
+                        C[i * n + j+3] = 0.0;
+                        for (int k = 0; k<MIN(kk+BF, n); ++k) {
+                            C[i * n + j] += A[i * n + k] * B[k * n + j];
+                            C[i * n + j+1] += A[i * n + k] * B[k * n + j+1];
+                            C[i * n + j+2] += A[i * n + k] * B[k * n + j+2];
+                            C[i * n + j+3] += A[i * n + k] * B[k * n + j+3];
+                        }
+                    }
+}
+
+void multMatMatNaive(MatRow A, MatRow B, int n, MatRow C) {
     /* Efetua a multiplicação */
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             for (int k = 0; k < n; ++k)
+               C[i * n + j] += A[i * n + k] * B[k * n + j];
+}
+
+void multMatMatUnroll(MatRow A, MatRow B, int n, MatRow C) {
+    /* Efetua a multiplicação */
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; j+=UF) {
+            C[i * n + j] = 0.0;
+            C[i * n + j+1] = 0.0;
+            C[i * n + j+2] = 0.0;
+            C[i * n + j+3] = 0.0;
+            for (int k = 0; k < n; ++k) {
                 C[i * n + j] += A[i * n + k] * B[k * n + j];
+                C[i * n + j+1] += A[i * n + k] * B[k * n + j+1];
+                C[i * n + j+2] += A[i * n + k] * B[k * n + j+2];
+                C[i * n + j+3] += A[i * n + k] * B[k * n + j+3];
+            }
+        }
 }
 
 /**
