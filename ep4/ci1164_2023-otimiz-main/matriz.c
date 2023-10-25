@@ -71,8 +71,7 @@ Vetor geraVetor(int n, int zerar) {
         if (zerar)
             memset(vetor, 0, n * sizeof(real_t));
         else
-            for (int i = 0; i < n; ++i) 
-              vetor[i] = generateRandomB();
+            for (int i = 0; i < n; ++i) vetor[i] = generateRandomB();
     }
 
     return (vetor);
@@ -101,10 +100,14 @@ void liberaVetor(void *vet) { free(vet); }
 void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
     /* Efetua a multiplicação */
     if (res) {
-        for (int i = 0; i < m; i+=4)
-            for (int j = 0; j < n; ++j) 
-              res[i] += mat[n * i + j] * v[j];
-              res[i+1] += mat[n * (i+1) + j] * v[j];
+        for (int i = 0; i < m; i += 4) {
+            for (int j = 0; j < n; ++j) {
+                res[i] += mat[n * i + j] * v[j];
+                res[i + 1] += mat[n * (i + 1) + j] * v[j];
+                res[i + 2] += mat[n * (i + 2) + j] * v[j];
+                res[i + 3] += mat[n * (i + 3) + j] * v[j];
+            }
+        }
     }
 }
 
