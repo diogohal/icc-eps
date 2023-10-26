@@ -5,7 +5,7 @@
 # Compilador
            CC = gcc -Wall
 
-       CFLAGS =  
+       CFLAGS = -O3 -mavx -march=native
        LFLAGS = -lm
 
 # Lista de arquivos para distribuição
@@ -15,7 +15,7 @@ DISTDIR = `basename ${PWD}`
 .PHONY: all debug clean purge dist
 
 %.o: %.c %.h
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -c $<
 
 all: $(PROG)
 
@@ -23,7 +23,7 @@ debug:         CFLAGS += -g -D_DEBUG_
 debug:         $(PROG)
 
 $(PROG): $(OBJS) 
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+	$(CC) -o $(PROG) $(OBJS) $ -L${LIKWID_LIB} -llikwid $(CFLAGS)
 
 
 clean:
