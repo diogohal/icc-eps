@@ -97,7 +97,7 @@ void liberaVetor(void *vet) { free(vet); }
  *
  */
 
-void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
+void multMatVetUnroll(MatRow mat, Vetor v, int m, int n, Vetor res) {
     /* Efetua a multiplicação */
     if (res) {
         for (int i = 0; i < m - (m % UF); i += UF) {
@@ -112,6 +112,36 @@ void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
         for (int i = m - (m % UF); i < m; ++i)
             for (int j=0; j < n; ++j)
                 res[i] += mat[n * i + j] * v[j];
+    }
+}
+
+void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
+    /* Efetua a multiplicação */
+    if (res) {
+        int istart, iend, jstart, jend;
+
+        for(int ii=0; ii<n/BF; ii++) {
+            istart = ii*BF; iend = istart+BF;
+            for(int jj=0; jj<n/BF; jj++) {
+                jstart = jj*BF; jend = jstart+BF;
+                for (int i = istart; i < iend; i += UF) {
+                    for (int j = jstart; j < jend; ++j) {
+                        res[i] += mat[n * i + j] * v[j];
+                        res[i + 1] += mat[n * (i + 1) + j] * v[j];
+                        res[i + 2] += mat[n * (i + 2) + j] * v[j];
+                        res[i + 3] += mat[n * (i + 3) + j] * v[j];
+                    }
+                }
+
+                // for (int i = m - (m % UF); i < m; ++i)
+                //     for (int j=0; j < n; ++j)
+                //         res[i] += mat[n * i + j] * v[j];
+            }
+        }
+
+
+
+        
     }
 }
 

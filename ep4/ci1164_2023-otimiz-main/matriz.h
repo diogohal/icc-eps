@@ -29,6 +29,7 @@ Vetor geraVetor (int n, int zerar);
 void liberaVetor (void *vet);
 
 void multMatVet (MatRow mat, Vetor v, int m, int n, Vetor res);
+void multMatVetUnroll(MatRow mat, Vetor v, int m, int n, Vetor res);
 void multMatMat(MatRow A, MatRow B, int n, MatRow C);
 void multMatMatNaive(MatRow A, MatRow B, int n, MatRow C);
 void multMatMatUnroll(MatRow A, MatRow B, int n, MatRow C); 
