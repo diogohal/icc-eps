@@ -10,7 +10,7 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 #define UF 4
-#define BF 2048
+#define BF 4
 
 #define ABS(num)  ((num) < 0.0 ? -(num) : (num))
 

@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
     printf ("=================================\n\n");
 #endif 
   start = timestamp();
-  multMatVet (mRow_1, vet, n, n, res);
+  // multMatVet (mRow_1, vet, n, n, res);
   stop = timestamp();
   tMatVet = stop - start;
 
@@ -88,12 +88,12 @@ int main (int argc, char *argv[])
   tMatMat = stop - start;
 
   start = timestamp();
-  multMatMatNaive(mRow_1, mRow_2, n, resMat);
+  // multMatMatNaive(mRow_1, mRow_2, n, resMat);
   stop = timestamp();
   tMatMatNaive = stop - start;
 
   start = timestamp();
-  multMatMatUnroll(mRow_1, mRow_2, n, resMat);
+  // multMatMatUnroll(mRow_1, mRow_2, n, resMat);
   stop = timestamp();
   tMatMatUnroll = stop - start;
 

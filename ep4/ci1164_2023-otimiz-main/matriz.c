@@ -140,22 +140,32 @@ void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
 void multMatMat(MatRow A, MatRow B, int n, MatRow C) {
     /* COM BLOCKING */
     // Tem alguma coisa errada erradinha nao funciona mt bem
-    for(int ii=0; ii<n; ii+=BF)
-        for(int jj=0; jj<n; jj+=BF)
-            for(int kk=0; kk<n; kk+=BF)
-                for (int i = 0; i < MIN(ii+BF, n); ++i)
-                    for (int j = 0; j < MIN(jj+BF, n); j+=UF) {
+    int istart, iend, jstart, jend, kstart, kend;
+    for(int ii=0; ii<n/BF; ii++) {
+        istart = ii*BF; iend = istart+BF;
+        for(int jj=0; jj<n/BF; jj++) {
+            jstart = jj*BF; jend = jstart+BF;
+            for(int kk=0; kk<n/BF; kk++) {
+                kstart = kk*BF; kend = kstart + BF;
+                for (int i = istart; i < iend; ++i) {
+                    for (int j = jstart; j < jend; j+=UF) {
                         C[i * n + j] = 0.0;
                         C[i * n + j+1] = 0.0;
                         C[i * n + j+2] = 0.0;
                         C[i * n + j+3] = 0.0;
-                        for (int k = 0; k<MIN(kk+BF, n); ++k) {
+                        for (int k = kstart; k<kend; ++k) {
                             C[i * n + j] += A[i * n + k] * B[k * n + j];
                             C[i * n + j+1] += A[i * n + k] * B[k * n + j+1];
                             C[i * n + j+2] += A[i * n + k] * B[k * n + j+2];
                             C[i * n + j+3] += A[i * n + k] * B[k * n + j+3];
                         }
                     }
+                }
+            }
+        }
+    }
+
+
 }
 
 void multMatMatNaive(MatRow A, MatRow B, int n, MatRow C) {
