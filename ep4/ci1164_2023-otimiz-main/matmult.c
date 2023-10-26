@@ -4,9 +4,8 @@
 #include <getopt.h>    /* getopt */
 #include <time.h>
 #include <sys/time.h>
-
 #include "matriz.h"
-// #include "likwid.h"
+#include "likwid.h"
 
 
 /**
@@ -36,6 +35,7 @@ double timestamp(void) {
 
 int main (int argc, char *argv[]) 
 {
+  LIKWID_MARKER_INIT;
   int n=DEF_SIZE;
   double start, stop, tMatVet, tMatMat, tMatMatNaive, tMatMatUnroll;
   
@@ -77,16 +77,20 @@ int main (int argc, char *argv[])
     prnVetor (vet, n);
     printf ("=================================\n\n");
 #endif 
+  LIKWID_MARKER_START("matvet");
   start = timestamp();
-  // multMatVet (mRow_1, vet, n, n, res);
+  multMatVet (mRow_1, vet, n, n, res);
   stop = timestamp();
   tMatVet = stop - start;
-
+  LIKWID_MARKER_STOP("matvet");
+  
+  LIKWID_MARKER_START("matmat");
   start = timestamp();
   multMatMat (mRow_1, mRow_2, n, resMat);
   stop = timestamp();
   tMatMat = stop - start;
-
+  LIKWID_MARKER_STOP("matmat");
+  
   start = timestamp();
   // multMatMatNaive(mRow_1, mRow_2, n, resMat);
   stop = timestamp();
@@ -99,8 +103,8 @@ int main (int argc, char *argv[])
 
   printf("Tempo matriz vetor: %f\n", tMatVet);
   printf("Tempo matriz matriz unroll blocking: %f\n", tMatMat);
-  printf("Tempo matriz matriz unroll: %f\n", tMatMatUnroll);
-  printf("Tempo matriz matriz naive: %f\n", tMatMatNaive);
+  // printf("Tempo matriz matriz unroll: %f\n", tMatMatUnroll);
+  // printf("Tempo matriz matriz naive: %f\n", tMatMatNaive);
 
 #ifdef _DEBUG_
     prnVetor (res, n);
@@ -112,7 +116,7 @@ int main (int argc, char *argv[])
   liberaVetor ((void*) resMat);
   liberaVetor ((void*) vet);
   liberaVetor ((void*) res);
-
+  LIKWID_MARKER_CLOSE;
   return 0;
 }
 
