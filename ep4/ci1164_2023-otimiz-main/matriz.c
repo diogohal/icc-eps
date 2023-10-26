@@ -145,16 +145,16 @@ void multMatVet(MatRow mat, Vetor v, int m, int n, Vetor res) {
     }
 }
 
-// void multMatVet (MatRow mat, Vetor v, int m, int n, Vetor res)
-// {
+void multMatVetNaive (MatRow mat, Vetor v, int m, int n, Vetor res)
+{
     
-//   /* Efetua a multiplicação */
-//   if (res) {
-//     for (int i=0; i < m; ++i)
-//       for (int j=0; j < n; ++j)
-//         res[i] += mat[n*i + j] * v[j];
-//   }
-// }
+  /* Efetua a multiplicação */
+  if (res) {
+    for (int i=0; i < m; ++i)
+      for (int j=0; j < n; ++j)
+        res[i] += mat[n*i + j] * v[j];
+  }
+}
 
 
 /**
