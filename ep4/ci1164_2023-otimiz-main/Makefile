@@ -16,4 +16,4 @@ clean:
 	rm -f *.o
 
 purge: clean
-	rm -f interpola
+	rm -f matmult
