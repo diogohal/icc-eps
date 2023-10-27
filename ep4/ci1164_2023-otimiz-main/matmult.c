@@ -79,14 +79,14 @@ int main (int argc, char *argv[])
 #endif 
   LIKWID_MARKER_START("matvet");
   start = timestamp();
-  multMatVet (mRow_1, vet, n, n, res);
+  multMatVetNaive (mRow_1, vet, n, n, res);
   stop = timestamp();
   tMatVet = stop - start;
   LIKWID_MARKER_STOP("matvet");
   
   LIKWID_MARKER_START("matmat");
   start = timestamp();
-  multMatMat (mRow_1, mRow_2, n, resMat);
+  multMatMatNaive (mRow_1, mRow_2, n, resMat);
   stop = timestamp();
   tMatMat = stop - start;
   LIKWID_MARKER_STOP("matmat");
