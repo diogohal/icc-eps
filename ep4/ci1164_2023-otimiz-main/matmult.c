@@ -79,29 +79,29 @@ int main (int argc, char *argv[])
 #endif 
   LIKWID_MARKER_START("matvet");
   start = timestamp();
-  multMatVetNaive (mRow_1, vet, n, n, res);
+  multMatVet (mRow_1, vet, n, n, res);
   stop = timestamp();
   tMatVet = stop - start;
   LIKWID_MARKER_STOP("matvet");
   
   LIKWID_MARKER_START("matmat");
   start = timestamp();
-  multMatMatNaive (mRow_1, mRow_2, n, resMat);
+  multMatMat (mRow_1, mRow_2, n, resMat);
   stop = timestamp();
   tMatMat = stop - start;
   LIKWID_MARKER_STOP("matmat");
   
-  start = timestamp();
+  // start = timestamp();
   // multMatMatNaive(mRow_1, mRow_2, n, resMat);
-  stop = timestamp();
-  tMatMatNaive = stop - start;
+  // stop = timestamp();
+  // tMatMatNaive = stop - start;
 
-  start = timestamp();
+  // start = timestamp();
   // multMatMatUnroll(mRow_1, mRow_2, n, resMat);
-  stop = timestamp();
-  tMatMatUnroll = stop - start;
+  // stop = timestamp();
+  // tMatMatUnroll = stop - start;
 
-  printf("Tempo matriz vetor: %f\n", tMatVet);
+  printf("Tempo matriz vetor unroll blocking: %f\n", tMatVet);
   printf("Tempo matriz matriz unroll blocking: %f\n", tMatMat);
   // printf("Tempo matriz matriz unroll: %f\n", tMatMatUnroll);
   // printf("Tempo matriz matriz naive: %f\n", tMatMatNaive);
