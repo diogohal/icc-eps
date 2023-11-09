@@ -1,80 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "utils.h"
+#include <time.h>
+#include <sys/time.h>
+#define PONTOS 10000000
 
-#define DIFF 0.0
-#define N 2
-#define NRAND    ((double) rand() / RAND_MAX)  // drand48() 
-#define SRAND(a) srand(a) // srand48(a)
-
+// Calcula o tempo atual em milissegundos
+double timestamp(void){
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return((double)(tp.tv_sec+tp.tv_usec/1000000.0))*1000;
+}
 
 // Integral Monte Carlo da função Styblinski-Tang de 2 variáveis
-double monteCarlo(double a, double b, int namostras)
+double monteCarlo(double a, double b)
 {
   double resultado;
-  double soma = 0.0;
+  double soma = 0.0;  
   
-  printf("Metodo de Monte Carlo (x, y).\n");
-  printf("a = (%f), b = (%f), n = (%d), variaveis = 2\n", a, b, namostras);
-  
-  double t_inicial = timestamp();
-  
-  // MONTE CARLO ALGORITMO para a função Styblinski-Tang
-
+  // Monte Carlo algoritmo para a função Styblinski-Tang
   double x , sum = 0;
-  for ( int i =0; i < namostras ; i ++) {
+  for ( int i =0; i < PONTOS ; i ++) {
     x = a + (( double ) random () / RAND_MAX ) * ( b - a );
     sum += (x*x*x*x - 16*x*x + 5*x)/2;
   }
+  resultado = ( sum / PONTOS ) * ( b - a );
 
-  resultado = ( sum / namostras ) * ( b - a );
-  
-  double t_final = timestamp();
-  printf("Tempo decorrido: %f seg.\n", t_final - t_inicial);
-  
+  if(resultado < 0)
+    resultado = resultado * -1;
   return resultado;
 }
 
 
-double retangulos_xy(double a, double b, int namostras) {
+double retangulos_xy(double a, double b) {
 
   double h;
-  double resultado;
   double x = 0.0;
-  
-  printf("Metodo dos Retangulos (x, y).\n");
-  printf("a = (%f), b = (%f), n = (%d), h = (%lg)\n", a, b, namostras, h);
-  
-  double t_inicial = timestamp();
-
-  // MÉTODO DO RETÂNGULO
-  h = (b - a)/namostras;
   double soma = 0.0;
-  for(int i = 0; i < namostras; ++i) {
+  
+  // MÉTODO DO RETÂNGULO
+  h = (b - a)/PONTOS;
+  printf("%f\n", h);
+  for(int i = 0; i < PONTOS; ++i) {
     x = a + h*i;
     soma += (x*x*x*x - 16*x*x + 5*x)/2*h;
   }
-
-
-  double t_final = timestamp();
-  printf("Tempo decorrido: %f seg.\n", t_final - t_inicial);
   
-  return resultado;
+  if(soma < 0)
+    soma = soma*-1;
+  return soma;
 }
 
 
 int main(int argc, char **argv) {
-
-  if (argc < 5) {
-    printf("Utilização: %s inicial final n_amostras n_variaveis\n", argv[0]);
+  if (argc < 4) {
+    printf("Utilização: %s inicial final n_dimensoes\n", argv[0]);
     return 1;
   }
 
-  srand(2023);
+  double inicial = atof(argv[1]);
+  double final = atof(argv[2]);
+  double n_dimensoes = atoi(argv[3]);
+
+  srand(20232);
     
-  double resultado = retangulos_xy(2, 5, 2);
-  printf("RESULTADO FINAL = %f\n", resultado);
-  
+  double resultadoRet = retangulos_xy(inicial, final);
+  double resultadoMont = monteCarlo(inicial, final);
+
+  printf("Resultado Método Retângulo = %f\n", resultadoRet);
+  printf("Resultado Método Monte Carlo = %f\n", resultadoMont);
+  printf("Resultado aproximado = 136.53\n"); 
   return 0;
 }
