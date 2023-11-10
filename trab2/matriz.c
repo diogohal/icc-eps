@@ -29,7 +29,7 @@ matriz_t *criaMatriz(int tam) {
     if (!matriz->B) return NULL;
     matriz->X = malloc(sizeof(intervalo_t) * tam);
     if (!matriz->X) return NULL;
-   
+
     for (int i = 0; i < tam; i++) {
         transformaIntervalo(&matriz->B[i], 0);
         transformaIntervalo(&matriz->X[i], 0);
@@ -51,7 +51,7 @@ void printaMatriz(matriz_t *matriz) {
 }
 
 // Usa o método da retrossubistituição em uma matriz após a elminação de gauss
-void retrossubs(matriz_t *matriz) {
+void retrossubsNaive(matriz_t *matriz) {
     for (int i = matriz->tam - 1; i >= 0; i--) {
         matriz->X[i] = matriz->B[i];
         for (int j = matriz->tam - 1; j > i; j--) {
@@ -59,6 +59,34 @@ void retrossubs(matriz_t *matriz) {
                                      multiplica(matriz->X[j], matriz->A[i][j]));
         }
         matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
+    }
+}
+
+void retrossubs(matriz_t *matriz) {
+    int istart, iend, jstart, jend;
+    for(int ii = matriz->tam-1; ii >= (matriz->tam-1) - BF; ii++){
+        istart = ii*BF;
+        iend = istart + BF;
+        for(int jj = (matriz->tam-1)/BF; jj >= 0; jj++){
+            jstart = jj * BF;
+            jend = jstart + BF;
+            for(int i = istart; i < iend; i += UF){
+                matriz->X[i] = matriz->B[i];
+                matriz->X[i+1] = matriz->B[i+1];
+                matriz->X[i+2] = matriz->B[i+2];
+                matriz->X[i+3] = matriz->B[i+3];
+                for(int j = jstart; j < jend; j++){
+                    matriz->X[i] = subtracao(matriz->X[i], multiplica(matriz->X[j], matriz->A[i][j]));
+                    matriz->X[i+1] = subtracao(matriz->X[i+1], multiplica(matriz->X[j+1], matriz->A[i+1][j+1]));
+                    matriz->X[i+2] = subtracao(matriz->X[i+2], multiplica(matriz->X[j+2], matriz->A[i+2][j+2]));
+                    matriz->X[i+3] = subtracao(matriz->X[i+3], multiplica(matriz->X[j+3], matriz->A[i+3][j+3]));
+                }
+                matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
+                matriz->X[i+1] = divisao(matriz->X[i+1], matriz->A[i+1][i+1]);
+                matriz->X[i+2] = divisao(matriz->X[i+2], matriz->A[i+2][i+2]);
+                matriz->X[i+3] = divisao(matriz->X[i+3], matriz->A[i+3][i+3]);
+            }
+        }
     }
 }
 
@@ -134,12 +162,11 @@ void criaSL(pontos_t *xy, matriz_t *SL, int k, int n) {
 }
 
 // Calcula o resíduo de uma matriz
-intervalo_t* calculaResiduo(matriz_t *matriz, pontos_t *xy, int k){
+intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, int k) {
     intervalo_t aux, fx;
-    intervalo_t *ret = malloc(sizeof(intervalo_t)*k);
-    if(!ret)
-        return NULL;
-    
+    intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
+    if (!ret) return NULL;
+
     for (int i = 0; i < k; i++) {
         transformaIntervalo(&aux, xy[i].x);
         fx.max = 0;
@@ -153,7 +180,7 @@ intervalo_t* calculaResiduo(matriz_t *matriz, pontos_t *xy, int k){
     return ret;
 }
 
-void libera(matriz_t *matriz, intervalo_t* residuo) {
+void libera(matriz_t *matriz, intervalo_t *residuo) {
     for (int i = 0; i < matriz->tam; i++) {
         free(matriz->A[i]);
     }
