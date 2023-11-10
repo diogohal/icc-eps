@@ -13,16 +13,19 @@ double timestamp(void){
 }
 
 // Integral Monte Carlo da função Styblinski-Tang de 2 variáveis
-double monteCarlo(double a, double b)
+double monteCarlo(double a, double b, int n_dimensoes)
 {
   double resultado;
   double soma = 0.0;  
   
   // Monte Carlo algoritmo para a função Styblinski-Tang
+  
   double x , sum = 0;
-  for ( int i =0; i < PONTOS ; i ++) {
-    x = a + (( double ) random () / RAND_MAX ) * ( b - a );
-    sum += (x*x*x*x - 16*x*x + 5*x)/2;
+  for(int j = 0; j < n_dimensoes; j++) {
+    for ( int i =0; i < PONTOS ; i ++) {
+      x = a + (( double ) random () / RAND_MAX ) * ( b - a );
+      sum += (x*x*x*x - 16*x*x + 5*x)/2;
+    }
   }
   resultado = ( sum / PONTOS ) * ( b - a );
 
@@ -32,7 +35,7 @@ double monteCarlo(double a, double b)
 }
 
 
-double retangulos_xy(double a, double b) {
+double retangulos_xy(double a, double b, int n_dimensoes) {
 
   double h;
   double x = 0.0;
@@ -41,9 +44,11 @@ double retangulos_xy(double a, double b) {
   // MÉTODO DO RETÂNGULO
   h = (b - a)/PONTOS;
   printf("%f\n", h);
-  for(int i = 0; i < PONTOS; ++i) {
-    x = a + h*i;
-    soma += (x*x*x*x - 16*x*x + 5*x)/2*h;
+  for(int j = 0; j < n_dimensoes; j++) {
+    for(int i = 0; i < PONTOS; ++i) {
+      x = a + h*i;
+      soma += (x*x*x*x - 16*x*x + 5*x)/2*h;
+    }
   }
   
   if(soma < 0)
@@ -64,11 +69,10 @@ int main(int argc, char **argv) {
 
   srand(20232);
     
-  double resultadoRet = retangulos_xy(inicial, final);
-  double resultadoMont = monteCarlo(inicial, final);
+  double resultadoRet = retangulos_xy(inicial, final, n_dimensoes);
+  double resultadoMont = monteCarlo(inicial, final, n_dimensoes);
 
   printf("Resultado Método Retângulo = %f\n", resultadoRet);
   printf("Resultado Método Monte Carlo = %f\n", resultadoMont);
-  printf("Resultado aproximado = 136.53\n"); 
   return 0;
 }
