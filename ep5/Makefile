@@ -1,8 +1,8 @@
 all: integra.o
-	gcc integra.o -o integra  
+	gcc -O3 integra.o -o integra -lm  
 
 integra.o: integra.c
-	gcc -c integra.c
+	gcc -O3 -c integra.c 
 
 clean:
 	rm -f *.o
