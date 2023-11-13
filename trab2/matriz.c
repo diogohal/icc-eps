@@ -1,5 +1,4 @@
 #include "matriz.h"
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,37 +60,88 @@ void retrossubsNaive(matriz_t *matriz) {
         matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
     }
 }
+// nao funciona
+void retrossubsUnroll(matriz_t *matriz) {
+    int save = matriz->tam - 1;
+    for (int i = (matriz->tam - 1); i >= 0; i--) {
+        matriz->X[i] = matriz->B[i];
+        for (int j = matriz->tam - 1; j-UF > i; j -= UF) {
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j], matriz->A[i][j]));
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j-1], matriz->A[i][j-1]));
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j-2], matriz->A[i][j-2]));
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j-3], matriz->A[i][j-3]));
+            save = j-UF;
+        }
+        // Resíduo
+        for(int j = save; j>i; j--) {
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j], matriz->A[i][j]));
+        }
+        matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
+    }
+}
 
 void retrossubs(matriz_t *matriz) {
-    int istart, iend, jstart, jend;
-    for(int ii = matriz->tam-1; ii >= (matriz->tam-1) - BF; ii++){
-        istart = ii*BF;
+    int istart, iend;
+    int save;
+    for (int ii = (matriz->tam-1)/BF; ii>=0; ii--) {
+        istart = (matriz->tam-1) * BF;
         iend = istart + BF;
-        for(int jj = (matriz->tam-1)/BF; jj >= 0; jj++){
-            jstart = jj * BF;
-            jend = jstart + BF;
-            for(int i = istart; i < iend; i += UF){
-                matriz->X[i] = matriz->B[i];
-                matriz->X[i+1] = matriz->B[i+1];
-                matriz->X[i+2] = matriz->B[i+2];
-                matriz->X[i+3] = matriz->B[i+3];
-                for(int j = jstart; j < jend; j++){
-                    matriz->X[i] = subtracao(matriz->X[i], multiplica(matriz->X[j], matriz->A[i][j]));
-                    matriz->X[i+1] = subtracao(matriz->X[i+1], multiplica(matriz->X[j+1], matriz->A[i+1][j+1]));
-                    matriz->X[i+2] = subtracao(matriz->X[i+2], multiplica(matriz->X[j+2], matriz->A[i+2][j+2]));
-                    matriz->X[i+3] = subtracao(matriz->X[i+3], multiplica(matriz->X[j+3], matriz->A[i+3][j+3]));
-                }
-                matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
-                matriz->X[i+1] = divisao(matriz->X[i+1], matriz->A[i+1][i+1]);
-                matriz->X[i+2] = divisao(matriz->X[i+2], matriz->A[i+2][i+2]);
-                matriz->X[i+3] = divisao(matriz->X[i+3], matriz->A[i+3][i+3]);
+        save = matriz->tam - 1;
+        for (int i = istart; i >= iend; i--) {
+            matriz->X[i] = matriz->B[i];
+            for (int j = matriz->tam - 1; j-UF > i; j -= UF) {
+                matriz->X[i] = subtracao(matriz->X[i],
+                                        multiplica(matriz->X[j], matriz->A[i][j]));
+                matriz->X[i] = subtracao(matriz->X[i],
+                                        multiplica(matriz->X[j-1], matriz->A[i][j-1]));
+                matriz->X[i] = subtracao(matriz->X[i],
+                                        multiplica(matriz->X[j-2], matriz->A[i][j-2]));
+                matriz->X[i] = subtracao(matriz->X[i],
+                                        multiplica(matriz->X[j-3], matriz->A[i][j-3]));
+                save = j-UF;
             }
+            // Resíduo do unroll
+            for(int j = save; j>i; j--) {
+                matriz->X[i] = subtracao(matriz->X[i],
+                                        multiplica(matriz->X[j], matriz->A[i][j]));
+            }
+            matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
         }
+    }
+    // Resíduo do loop tilling
+    for(int i=(matriz->tam-1)%BF; i>=0; i--) {
+        matriz->X[i] = matriz->B[i];
+        for (int j = matriz->tam - 1; j > i; j--) {
+            matriz->X[i] = subtracao(matriz->X[i],
+                                     multiplica(matriz->X[j], matriz->A[i][j]));
+        }
+        matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
     }
 }
 
 // Função auxiliar do pivoteamento parcial para encontrar o máximo
 int encontraMaxParcial(matriz_t *matriz, int i) {
+    int iMax = i;
+    int save = i+1;
+    for (int j = i + 1; j < matriz->tam - (matriz->tam % UF); j+= UF){
+        if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
+        if (abs(matriz->A[j+1][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+1;
+        if (abs(matriz->A[j+2][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+2;
+        if (abs(matriz->A[j+3][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+3;
+        save = j+UF;
+    }
+    
+    for(int j = save; j < matriz->tam; j++)
+        if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
+    return iMax;
+}
+
+int encontraMaxParcialNaive(matriz_t *matriz, int i) {
     int iMax = i;
     for (int j = i + 1; j < matriz->tam; j++)
         if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
@@ -119,11 +169,55 @@ void pivoteamentoParcial(matriz_t *matriz, int i) {
 }
 
 // Aplica o método da eliminação gaussiana
-void eliminacaoGauss(matriz_t *matriz) {
+void eliminacaoGaussNaive(matriz_t *matriz) {
     intervalo_t m, sub, mul;
     int iMax = 0;
     // Para cada linha
     for (int i = 0; i < matriz->tam; i++) {
+        pivoteamentoParcial(matriz, i);
+        // Para cada linha subsequente
+        for (int k = i + 1; k < matriz->tam; k++) {
+            m = divisao(matriz->A[k][i], matriz->A[i][i]);
+            matriz->A[k][i].max = 0;
+            matriz->A[k][i].min = 0;
+            // Para cada coluna da linha subsequente
+            for (int j = i + 1; j < matriz->tam; j++) {
+                mul = multiplica(matriz->A[i][j], m);
+                sub = subtracao(matriz->A[k][j], mul);
+                matriz->A[k][j] = sub;
+            }
+            matriz->B[k] = subtracao(matriz->B[k], multiplica(matriz->B[i], m));
+        }
+    }
+}
+
+void eliminacaoGauss(matriz_t *matriz) {
+    intervalo_t m, sub, mul;
+    int iMax = 0;
+    int iStart, iEnd = 0;
+    // Para cada linha
+    for(int ii=0; ii< matriz->tam/BF; ii++) {
+        iStart = ii*BF;
+        iEnd = iStart + BF;
+        for (int i = iStart; i < iEnd; i++) {
+            pivoteamentoParcial(matriz, i);
+            // Para cada linha subsequente
+            for (int k = i + 1; k < matriz->tam; k++) {
+                m = divisao(matriz->A[k][i], matriz->A[i][i]);
+                matriz->A[k][i].max = 0;
+                matriz->A[k][i].min = 0;
+                // Para cada coluna da linha subsequente
+                for (int j = i + 1; j < matriz->tam; j++) {
+                    mul = multiplica(matriz->A[i][j], m);
+                    sub = subtracao(matriz->A[k][j], mul);
+                    matriz->A[k][j] = sub;
+                }
+                matriz->B[k] = subtracao(matriz->B[k], multiplica(matriz->B[i], m));
+            }
+        }
+    }
+    // Resíduo de I
+    for(int i = iEnd; i < matriz->tam; i++) {
         pivoteamentoParcial(matriz, i);
         // Para cada linha subsequente
         for (int k = i + 1; k < matriz->tam; k++) {
