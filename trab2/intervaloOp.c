@@ -29,7 +29,6 @@ intervalo_t soma(intervalo_t inter1, intervalo_t inter2) {
 
 intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t res;
-    double aux;
     fesetround(FE_DOWNWARD);
     res.min = inter1.min - inter2.max;
     fesetround(FE_UPWARD);
@@ -39,7 +38,6 @@ intervalo_t subtracao(intervalo_t inter1, intervalo_t inter2) {
 
 intervalo_t divisao(intervalo_t inter1, intervalo_t inter2) {
     intervalo_t result;
-    double aux;
     if (inter2.min == 0.0 || inter2.max == 0.0) {
         result.min = -INFINITY;
         result.max = INFINITY;
@@ -53,7 +51,6 @@ intervalo_t divisao(intervalo_t inter1, intervalo_t inter2) {
 
 intervalo_t power(intervalo_t interval, int p) {
     intervalo_t result;
-    double aux = 0;
     if (p == 0) {
         result.min = 1;
         result.max = 1;

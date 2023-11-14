@@ -1,4 +1,4 @@
-CFLAGS = -O3 -mavx -march=native -lm
+CFLAGS = -O3 -mavx -march=native -lm -Wall
 
 all: ajustePol.o intervaloOp.o matriz.o
 	gcc -o ajustePol ajustePol.o matriz.o intervaloOp.o $ -L${LIKWID_LIB} -llikwid $(CFLAGS) 

@@ -6,6 +6,64 @@
 // Cria uma estrutura matriz_t dinamicamente e inicializa os valores com 0
 matriz_t *criaMatriz(int tam) {
     matriz_t *matriz = malloc(sizeof(matriz_t));
+    int istart = 0;
+    int iend = 0;
+    int jstart = 0;
+    int jend = 0;
+
+    if (!matriz) return NULL;
+
+    // Inicializa A
+    matriz->A = malloc(sizeof(intervalo_t *) * tam);
+    if (!matriz->A) return NULL;
+
+    for (int i = 0; i < tam; i++) {
+        matriz->A[i] = malloc(sizeof(intervalo_t) * tam);
+        if (!matriz->A[i]) return NULL;
+    }
+
+    for(int ii = 0; ii < tam/BF; ii++){
+        istart = ii * BF;
+        iend = istart + BF;
+        for(int jj = 0; jj < tam / BF; jj++){
+            jstart = jj * BF;
+            jend = jstart + BF;
+            for (int i = istart; i < iend; i++) {
+                for (int j = jstart; j < jend; j+=UF) {
+                    transformaIntervalo(&matriz->A[i][j], 0);
+                    transformaIntervalo(&matriz->A[i][j+1], 0);
+                    transformaIntervalo(&matriz->A[i][j+2], 0);
+                    transformaIntervalo(&matriz->A[i][j+3], 0);
+                }
+            }
+        }
+    }
+
+    for (int i = iend; i < tam; i++) {
+        for (int j = jend; j < tam; j++) {
+            transformaIntervalo(&matriz->A[i][j], 0);
+        }
+    }
+
+    // Inicializa B, X e resíduo
+    matriz->B = malloc(sizeof(intervalo_t) * tam);
+    if (!matriz->B) return NULL;
+    matriz->X = malloc(sizeof(intervalo_t) * tam);
+    if (!matriz->X) return NULL;
+
+    for (int i = 0; i < tam; i++) {
+        transformaIntervalo(&matriz->B[i], 0);
+        transformaIntervalo(&matriz->X[i], 0);
+    }
+
+    // Inicializa outras variáveis
+    matriz->tam = tam;
+    return matriz;
+}
+
+matriz_t *criaMatrizNaive(int tam) {
+    matriz_t *matriz = malloc(sizeof(matriz_t));
+
     if (!matriz) return NULL;
 
     // Inicializa A
@@ -171,7 +229,6 @@ void pivoteamentoParcial(matriz_t *matriz, int i) {
 // Aplica o método da eliminação gaussiana
 void eliminacaoGaussNaive(matriz_t *matriz) {
     intervalo_t m, sub, mul;
-    int iMax = 0;
     // Para cada linha
     for (int i = 0; i < matriz->tam; i++) {
         pivoteamentoParcial(matriz, i);
@@ -193,7 +250,6 @@ void eliminacaoGaussNaive(matriz_t *matriz) {
 
 void eliminacaoGauss(matriz_t *matriz) {
     intervalo_t m, sub, mul;
-    int iMax = 0;
     int iStart, iEnd = 0;
     // Para cada linha
     for(int ii=0; ii< matriz->tam/BF; ii++) {
@@ -235,7 +291,8 @@ void eliminacaoGauss(matriz_t *matriz) {
     }
 }
 
-void criaSL(pontos_t *xy, matriz_t *SL, int k, int n) {
+
+void criaSLNaive(pontos_t *xy, matriz_t *SL, int k, int n) {
     intervalo_t aux;
     intervalo_t aux2;
     for (int i = 0; i < n + 1; i++) {
@@ -255,8 +312,91 @@ void criaSL(pontos_t *xy, matriz_t *SL, int k, int n) {
     }
 }
 
+void criaSL(pontos_t *xy, matriz_t *SL, int k, int n) {
+    intervalo_t aux;
+    intervalo_t aux2;
+    int istart = 0;
+    int iend = 0;
+    int jstart = 0;
+    int jend = 0;
+    int sumstart = 0;
+    int sumend = 0;
+
+    for(int ii = 0; ii < (n+1)/BF; ii++){
+        istart = ii * BF;
+        iend = istart + BF;
+        for(int jj = 0; jj < (n+1)/BF; jj++){
+            jstart = jj * BF;
+            jend = jstart + BF;
+            for(int sumsum = 0; sumsum < k/BF; sumsum++){
+                sumstart = sumsum * BF;
+                sumend = sumstart + BF;
+                for (int i = istart; i < iend; i++) {
+                    for (int j = jstart; j < jend; j++) {
+                        for (int sum = sumstart; sum < sumend; sum++) {
+                            transformaIntervalo(&aux, xy[sum].x);
+                            aux = multiplica(power(aux, i), power(aux, j));
+                            SL->A[i][j] = soma(SL->A[i][j], aux);
+                        }
+                    }
+                    for (int sum = sumstart; sum < sumend; sum++) {
+                        transformaIntervalo(&aux, xy[sum].x);
+                        transformaIntervalo(&aux2, xy[sum].y);
+                        aux = multiplica(aux2, power(aux, i));
+                        SL->B[i] = soma(SL->B[i], aux);
+                    }
+                }
+            }
+        }
+    }
+    // Resíduo
+    for (int i = iend; i < n + 1; i++) {
+        for (int j = jend; j < n + 1; j++) {
+            for (int sum = sumend; sum < k; sum++) {
+                transformaIntervalo(&aux, xy[sum].x);
+                aux = multiplica(power(aux, i), power(aux, j));
+                SL->A[i][j] = soma(SL->A[i][j], aux);
+            }
+        }
+        for (int sum = sumend; sum < k; sum++) {
+            transformaIntervalo(&aux, xy[sum].x);
+            transformaIntervalo(&aux2, xy[sum].y);
+            aux = multiplica(aux2, power(aux, i));
+            SL->B[i] = soma(SL->B[i], aux);
+        }
+    }
+}
+
 // Calcula o resíduo de uma matriz
 intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, int k) {
+    intervalo_t aux, fx;
+    intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
+    if (!ret) return NULL;
+
+    int jstart = 0;
+    int jend = 0;
+
+    for (int i = 0; i < k; i++) {
+        transformaIntervalo(&aux, xy[i].x);
+        fx.max = 0;
+        fx.min = 0;
+        for(int jj = 0; jj < matriz->tam/BF; jj++){
+            jstart = jj * BF;
+            jend = jstart + BF;
+            for (int j = jstart; j < jend; j++) {
+                fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
+            }
+        }
+        for (int j = jend; j < matriz->tam; j++) {
+            fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
+        }
+        transformaIntervalo(&aux, xy[i].y);
+        ret[i] = subtracao(aux, fx);
+    }
+    return ret;
+}
+
+intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, int k) {
     intervalo_t aux, fx;
     intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
     if (!ret) return NULL;

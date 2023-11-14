@@ -17,13 +17,13 @@ double timestamp(void) {
 int main() {
     LIKWID_MARKER_INIT;
     double start, stop, tgeraSL, tsolSL = 0.0;
-    int n, k, returnScanf;
-    returnScanf = fscanf(stdin, "%d %d", &n, &k);
+    int n, k;
+    fscanf(stdin, "%d %d", &n, &k);
 
     pontos_t *pontos = malloc(sizeof(pontos_t) * k);
 
     for (int i = 0; i < k; i++) {
-        returnScanf = fscanf(stdin, "%lf %lf", &pontos[i].x, &pontos[i].y);
+        fscanf(stdin, "%lf %lf", &pontos[i].x, &pontos[i].y);
     }
 
     matriz_t *SL = criaMatriz(n + 1);

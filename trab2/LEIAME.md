@@ -2,6 +2,9 @@
 - loop tilling + unroll da retrossubstituição
 - unroll do encontraMaxParcial
 - loop tilling i eliminaçãoGauss
+- loop tilling i j sum criaSL
+- loop tilling j calculaResiduo
+- loop tilling i e j, unroll j criaMatriz
 
 # Dúvidas
 - loop tilling jj faz sentido para a retrossubstituição?
