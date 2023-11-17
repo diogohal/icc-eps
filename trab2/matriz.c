@@ -312,28 +312,28 @@ void criaSLNaive(pontos_t *xy, matriz_t *SL, int k, int n) {
     }
 }
 
-void criaSL(pontos_t *xy, matriz_t *SL, int k, int n) {
+void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
     intervalo_t aux;
     intervalo_t aux2;
-    int istart = 0;
-    int iend = 0;
-    int jstart = 0;
-    int jend = 0;
-    int sumstart = 0;
-    int sumend = 0;
+    long long int istart = 0;
+    long long int iend = 0;
+    long long int jstart = 0;
+    long long int jend = 0;
+    long long int sumstart = 0;
+    long long int sumend = 0;
 
-    for(int ii = 0; ii < (n+1)/BF; ii++){
+    for(long long int ii = 0; ii < (n+1)/BF; ii++){
         istart = ii * BF;
         iend = istart + BF;
-        for(int jj = 0; jj < (n+1)/BF; jj++){
+        for(long long int jj = 0; jj < (n+1)/BF; jj++){
             jstart = jj * BF;
             jend = jstart + BF;
-            for(int sumsum = 0; sumsum < k/BF; sumsum++){
+            for(long long int sumsum = 0; sumsum < k/BF; sumsum++){
                 sumstart = sumsum * BF;
                 sumend = sumstart + BF;
-                for (int i = istart; i < iend; i++) {
-                    for (int j = jstart; j < jend; j++) {
-                        for (int sum = sumstart; sum < sumend; sum++) {
+                for (long long int i = istart; i < iend; i++) {
+                    for (long long int j = jstart; j < jend; j++) {
+                        for (long long int sum = sumstart; sum < sumend; sum++) {
                             transformaIntervalo(&aux, xy[sum].x);
                             aux = multiplica(power(aux, i), power(aux, j));
                             SL->A[i][j] = soma(SL->A[i][j], aux);

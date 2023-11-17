@@ -17,8 +17,8 @@ double timestamp(void) {
 int main() {
     LIKWID_MARKER_INIT;
     double start, stop, tgeraSL, tsolSL = 0.0;
-    int n, k;
-    fscanf(stdin, "%d %d", &n, &k);
+    long long int n, k;
+    fscanf(stdin, "%lld %lld", &n, &k);
 
     pontos_t *pontos = malloc(sizeof(pontos_t) * k);
 
@@ -54,7 +54,7 @@ int main() {
     }
 
     printf("\n%f\n", tgeraSL);
-    printf("%f\n", tsolSL);
+    // printf("%f\n", tsolSL);
     LIKWID_MARKER_CLOSE;
 
     libera(SL, residuo);

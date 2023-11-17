@@ -39,6 +39,5 @@ intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, int k);
 void libera(matriz_t *matriz, intervalo_t* residuo);
 void copiaMatriz(matriz_t *m1, matriz_t *m2);
 void criaSLNaive(pontos_t *xy, matriz_t *SL, int k, int n);
-void criaSL(pontos_t *xy, matriz_t *SL, int k, int n);
-
+void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n);
 #endif
