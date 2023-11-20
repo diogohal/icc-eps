@@ -6,63 +6,6 @@
 // Cria uma estrutura matriz_t dinamicamente e inicializa os valores com 0
 matriz_t *criaMatriz(int tam) {
     matriz_t *matriz = malloc(sizeof(matriz_t));
-    int istart = 0;
-    int iend = 0;
-    int jstart = 0;
-    int jend = 0;
-
-    if (!matriz) return NULL;
-
-    // Inicializa A
-    matriz->A = malloc(sizeof(intervalo_t *) * tam);
-    if (!matriz->A) return NULL;
-
-    for (int i = 0; i < tam; i++) {
-        matriz->A[i] = malloc(sizeof(intervalo_t) * tam);
-        if (!matriz->A[i]) return NULL;
-    }
-
-    for(int ii = 0; ii < tam/BF; ii++){
-        istart = ii * BF;
-        iend = istart + BF;
-        for(int jj = 0; jj < tam / BF; jj++){
-            jstart = jj * BF;
-            jend = jstart + BF;
-            for (int i = istart; i < iend; i++) {
-                for (int j = jstart; j < jend; j+=UF) {
-                    transformaIntervalo(&matriz->A[i][j], 0);
-                    transformaIntervalo(&matriz->A[i][j+1], 0);
-                    transformaIntervalo(&matriz->A[i][j+2], 0);
-                    transformaIntervalo(&matriz->A[i][j+3], 0);
-                }
-            }
-        }
-    }
-
-    for (int i = iend; i < tam; i++) {
-        for (int j = jend; j < tam; j++) {
-            transformaIntervalo(&matriz->A[i][j], 0);
-        }
-    }
-
-    // Inicializa B, X e resíduo
-    matriz->B = malloc(sizeof(intervalo_t) * tam);
-    if (!matriz->B) return NULL;
-    matriz->X = malloc(sizeof(intervalo_t) * tam);
-    if (!matriz->X) return NULL;
-
-    for (int i = 0; i < tam; i++) {
-        transformaIntervalo(&matriz->B[i], 0);
-        transformaIntervalo(&matriz->X[i], 0);
-    }
-
-    // Inicializa outras variáveis
-    matriz->tam = tam;
-    return matriz;
-}
-
-matriz_t *criaMatrizNaive(int tam) {
-    matriz_t *matriz = malloc(sizeof(matriz_t));
 
     if (!matriz) return NULL;
 
@@ -108,71 +51,8 @@ void printaMatriz(matriz_t *matriz) {
 }
 
 // Usa o método da retrossubistituição em uma matriz após a elminação de gauss
-void retrossubsNaive(matriz_t *matriz) {
-    for (int i = matriz->tam - 1; i >= 0; i--) {
-        matriz->X[i] = matriz->B[i];
-        for (int j = matriz->tam - 1; j > i; j--) {
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j], matriz->A[i][j]));
-        }
-        matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
-    }
-}
-// nao funciona
-void retrossubsUnroll(matriz_t *matriz) {
-    int save = matriz->tam - 1;
-    for (int i = (matriz->tam - 1); i >= 0; i--) {
-        matriz->X[i] = matriz->B[i];
-        for (int j = matriz->tam - 1; j-UF > i; j -= UF) {
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j], matriz->A[i][j]));
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j-1], matriz->A[i][j-1]));
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j-2], matriz->A[i][j-2]));
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j-3], matriz->A[i][j-3]));
-            save = j-UF;
-        }
-        // Resíduo
-        for(int j = save; j>i; j--) {
-            matriz->X[i] = subtracao(matriz->X[i],
-                                     multiplica(matriz->X[j], matriz->A[i][j]));
-        }
-        matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
-    }
-}
-
 void retrossubs(matriz_t *matriz) {
-    int istart, iend;
-    int save;
-    for (int ii = (matriz->tam-1)/BF; ii>=0; ii--) {
-        istart = (matriz->tam-1) * BF;
-        iend = istart + BF;
-        save = matriz->tam - 1;
-        for (int i = istart; i >= iend; i--) {
-            matriz->X[i] = matriz->B[i];
-            for (int j = matriz->tam - 1; j-UF > i; j -= UF) {
-                matriz->X[i] = subtracao(matriz->X[i],
-                                        multiplica(matriz->X[j], matriz->A[i][j]));
-                matriz->X[i] = subtracao(matriz->X[i],
-                                        multiplica(matriz->X[j-1], matriz->A[i][j-1]));
-                matriz->X[i] = subtracao(matriz->X[i],
-                                        multiplica(matriz->X[j-2], matriz->A[i][j-2]));
-                matriz->X[i] = subtracao(matriz->X[i],
-                                        multiplica(matriz->X[j-3], matriz->A[i][j-3]));
-                save = j-UF;
-            }
-            // Resíduo do unroll
-            for(int j = save; j>i; j--) {
-                matriz->X[i] = subtracao(matriz->X[i],
-                                        multiplica(matriz->X[j], matriz->A[i][j]));
-            }
-            matriz->X[i] = divisao(matriz->X[i], matriz->A[i][i]);
-        }
-    }
-    // Resíduo do loop tilling
-    for(int i=(matriz->tam-1)%BF; i>=0; i--) {
+    for (int i = matriz->tam - 1; i >= 0; i--) {
         matriz->X[i] = matriz->B[i];
         for (int j = matriz->tam - 1; j > i; j--) {
             matriz->X[i] = subtracao(matriz->X[i],
@@ -184,22 +64,6 @@ void retrossubs(matriz_t *matriz) {
 
 // Função auxiliar do pivoteamento parcial para encontrar o máximo
 int encontraMaxParcial(matriz_t *matriz, int i) {
-    int iMax = i;
-    int save = i+1;
-    for (int j = i + 1; j < matriz->tam - (matriz->tam % UF); j+= UF){
-        if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
-        if (abs(matriz->A[j+1][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+1;
-        if (abs(matriz->A[j+2][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+2;
-        if (abs(matriz->A[j+3][i].max) > abs(matriz->A[iMax][i].max)) iMax = j+3;
-        save = j+UF;
-    }
-    
-    for(int j = save; j < matriz->tam; j++)
-        if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
-    return iMax;
-}
-
-int encontraMaxParcialNaive(matriz_t *matriz, int i) {
     int iMax = i;
     for (int j = i + 1; j < matriz->tam; j++)
         if (abs(matriz->A[j][i].max) > abs(matriz->A[iMax][i].max)) iMax = j;
@@ -227,7 +91,7 @@ void pivoteamentoParcial(matriz_t *matriz, int i) {
 }
 
 // Aplica o método da eliminação gaussiana
-void eliminacaoGaussNaive(matriz_t *matriz) {
+void eliminacaoGauss(matriz_t *matriz) {
     intervalo_t m, sub, mul;
     // Para cada linha
     for (int i = 0; i < matriz->tam; i++) {
@@ -248,62 +112,19 @@ void eliminacaoGaussNaive(matriz_t *matriz) {
     }
 }
 
-void eliminacaoGauss(matriz_t *matriz) {
-    intervalo_t m, sub, mul;
-    int iStart, iEnd = 0;
-    // Para cada linha
-    for(int ii=0; ii< matriz->tam/BF; ii++) {
-        iStart = ii*BF;
-        iEnd = iStart + BF;
-        for (int i = iStart; i < iEnd; i++) {
-            pivoteamentoParcial(matriz, i);
-            // Para cada linha subsequente
-            for (int k = i + 1; k < matriz->tam; k++) {
-                m = divisao(matriz->A[k][i], matriz->A[i][i]);
-                matriz->A[k][i].max = 0;
-                matriz->A[k][i].min = 0;
-                // Para cada coluna da linha subsequente
-                for (int j = i + 1; j < matriz->tam; j++) {
-                    mul = multiplica(matriz->A[i][j], m);
-                    sub = subtracao(matriz->A[k][j], mul);
-                    matriz->A[k][j] = sub;
-                }
-                matriz->B[k] = subtracao(matriz->B[k], multiplica(matriz->B[i], m));
-            }
-        }
-    }
-    // Resíduo de I
-    for(int i = iEnd; i < matriz->tam; i++) {
-        pivoteamentoParcial(matriz, i);
-        // Para cada linha subsequente
-        for (int k = i + 1; k < matriz->tam; k++) {
-            m = divisao(matriz->A[k][i], matriz->A[i][i]);
-            matriz->A[k][i].max = 0;
-            matriz->A[k][i].min = 0;
-            // Para cada coluna da linha subsequente
-            for (int j = i + 1; j < matriz->tam; j++) {
-                mul = multiplica(matriz->A[i][j], m);
-                sub = subtracao(matriz->A[k][j], mul);
-                matriz->A[k][j] = sub;
-            }
-            matriz->B[k] = subtracao(matriz->B[k], multiplica(matriz->B[i], m));
-        }
-    }
-}
 
-
-void criaSLNaive(pontos_t *xy, matriz_t *SL, int k, int n) {
+void criaSLNaive(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
     intervalo_t aux;
     intervalo_t aux2;
-    for (int i = 0; i < n + 1; i++) {
-        for (int j = 0; j < n + 1; j++) {
-            for (int sum = 0; sum < k; sum++) {
+    for (long long int i = 0; i < n + 1; i++) {
+        for (long long int j = 0; j < n + 1; j++) {
+            for (long long int sum = 0; sum < k; sum++) {
                 transformaIntervalo(&aux, xy[sum].x);
                 aux = multiplica(power(aux, i), power(aux, j));
                 SL->A[i][j] = soma(SL->A[i][j], aux);
             }
         }
-        for (int sum = 0; sum < k; sum++) {
+        for (long long int sum = 0; sum < k; sum++) {
             transformaIntervalo(&aux, xy[sum].x);
             transformaIntervalo(&aux2, xy[sum].y);
             aux = multiplica(aux2, power(aux, i));
@@ -315,93 +136,90 @@ void criaSLNaive(pontos_t *xy, matriz_t *SL, int k, int n) {
 void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
     intervalo_t aux;
     intervalo_t aux2;
-    long long int istart = 0;
-    long long int iend = 0;
-    long long int jstart = 0;
-    long long int jend = 0;
     long long int sumstart = 0;
     long long int sumend = 0;
 
-    for(long long int ii = 0; ii < (n+1)/BF; ii++){
-        istart = ii * BF;
-        iend = istart + BF;
-        for(long long int jj = 0; jj < (n+1)/BF; jj++){
-            jstart = jj * BF;
-            jend = jstart + BF;
-            for(long long int sumsum = 0; sumsum < k/BF; sumsum++){
-                sumstart = sumsum * BF;
-                sumend = sumstart + BF;
-                for (long long int i = istart; i < iend; i++) {
-                    for (long long int j = jstart; j < jend; j++) {
-                        for (long long int sum = sumstart; sum < sumend; sum++) {
-                            transformaIntervalo(&aux, xy[sum].x);
-                            aux = multiplica(power(aux, i), power(aux, j));
-                            SL->A[i][j] = soma(SL->A[i][j], aux);
-                        }
-                    }
-                    for (int sum = sumstart; sum < sumend; sum++) {
-                        transformaIntervalo(&aux, xy[sum].x);
-                        transformaIntervalo(&aux2, xy[sum].y);
-                        aux = multiplica(aux2, power(aux, i));
-                        SL->B[i] = soma(SL->B[i], aux);
-                    }
-                }
-            }
-        }
-    }
-    // Resíduo
-    for (int i = iend; i < n + 1; i++) {
-        for (int j = jend; j < n + 1; j++) {
-            for (int sum = sumend; sum < k; sum++) {
-                transformaIntervalo(&aux, xy[sum].x);
-                aux = multiplica(power(aux, i), power(aux, j));
-                SL->A[i][j] = soma(SL->A[i][j], aux);
-            }
-        }
-        for (int sum = sumend; sum < k; sum++) {
+    for(long long int sumsum = 0; sumsum < k/BF; sumsum++){
+        sumstart = sumsum * BF;
+        sumend = sumstart + BF;
+
+        for (long long int sum = sumstart; sum < sumend; sum++) {
             transformaIntervalo(&aux, xy[sum].x);
-            transformaIntervalo(&aux2, xy[sum].y);
-            aux = multiplica(aux2, power(aux, i));
-            SL->B[i] = soma(SL->B[i], aux);
+
+            for (long long int i = 0; i < n + 1; i++) {
+                intervalo_t power_i = power(aux, i);
+
+                for (long long int j = 0; j < n + 1; j++) {
+                    SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+                }
+
+                transformaIntervalo(&aux2, xy[sum].y);
+                SL->B[i] = soma(SL->B[i], multiplica(aux2, power_i));
+            }
         }
     }
+    for (long long int sum = sumend; sum < k; sum++) {
+        transformaIntervalo(&aux, xy[sum].x);
+
+        for (long long int i = 0; i < n + 1; i++) {
+            intervalo_t power_i = power(aux, i);
+
+            for (long long int j = 0; j < n + 1; j++) {
+                SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+            }
+
+            transformaIntervalo(&aux2, xy[sum].y);
+            SL->B[i] = soma(SL->B[i], multiplica(aux2, power_i));
+        }
+    }
+
 }
 
 // Calcula o resíduo de uma matriz
-intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, int k) {
+intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
     intervalo_t aux, fx;
     intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
     if (!ret) return NULL;
 
-    int jstart = 0;
-    int jend = 0;
+    long long int istart = 0;
+    long long int iend = 0;
 
-    for (int i = 0; i < k; i++) {
+    for(long long int ii = 0; ii < k/BF; ii++){
+        istart = ii * BF;
+        iend = istart + BF;
+
+        for (long long int i = istart; i < iend; i++) {
+            transformaIntervalo(&aux, xy[i].x);
+            fx.max = 0;
+            fx.min = 0;
+            for (int j = 0; j < matriz->tam; j++) {
+                fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
+            }
+            transformaIntervalo(&aux, xy[i].y);
+            ret[i] = subtracao(aux, fx);
+        }
+    }
+
+    for (long long int i = iend; i < k; i++) {
         transformaIntervalo(&aux, xy[i].x);
         fx.max = 0;
         fx.min = 0;
-        for(int jj = 0; jj < matriz->tam/BF; jj++){
-            jstart = jj * BF;
-            jend = jstart + BF;
-            for (int j = jstart; j < jend; j++) {
-                fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
-            }
-        }
-        for (int j = jend; j < matriz->tam; j++) {
+        for (int j = 0; j < matriz->tam; j++) {
             fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
         }
         transformaIntervalo(&aux, xy[i].y);
         ret[i] = subtracao(aux, fx);
     }
+
     return ret;
 }
 
-intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, int k) {
+intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, long long int k) {
     intervalo_t aux, fx;
     intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
     if (!ret) return NULL;
 
-    for (int i = 0; i < k; i++) {
+    for (long long int i = 0; i < k; i++) {
         transformaIntervalo(&aux, xy[i].x);
         fx.max = 0;
         fx.min = 0;

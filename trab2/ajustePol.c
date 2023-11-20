@@ -16,13 +16,13 @@ double timestamp(void) {
 
 int main() {
     LIKWID_MARKER_INIT;
-    double start, stop, tgeraSL, tsolSL = 0.0;
+    double start, stop, tgeraSL, tsolSL, tResiduo = 0.0;
     long long int n, k;
     fscanf(stdin, "%lld %lld", &n, &k);
 
     pontos_t *pontos = malloc(sizeof(pontos_t) * k);
 
-    for (int i = 0; i < k; i++) {
+    for (long long int i = 0; i < k; i++) {
         fscanf(stdin, "%lf %lf", &pontos[i].x, &pontos[i].y);
     }
 
@@ -41,19 +41,23 @@ int main() {
     LIKWID_MARKER_STOP("solSL");
     stop = timestamp();
     tsolSL = stop - start;
-    for (int i = 0; i < SL->tam; i++) {
-        printaIntervalo(&SL->X[i]);
-        printf(" ");
-    }
+    // for (int i = 0; i < SL->tam; i++) {
+    //     printaIntervalo(&SL->X[i]);
+    //     printf(" ");
+    // }
     printf("\n");
 
+    start = timestamp();
     intervalo_t *residuo = calculaResiduo(SL, pontos, k);
-    for (int i = 0; i < k; i++) {
-        printaIntervalo(&residuo[i]);
-        printf(" ");
-    }
+    stop = timestamp();
+    tResiduo = stop - start;
+    // for (int i = 0; i < k; i++) {
+    //     printaIntervalo(&residuo[i]);
+    //     printf(" ");
+    // }
+    printf("\n%f\n", tResiduo);
 
-    printf("\n%f\n", tgeraSL);
+    // printf("\n%f\n", tgeraSL);
     // printf("%f\n", tsolSL);
     LIKWID_MARKER_CLOSE;
 
