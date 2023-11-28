@@ -213,6 +213,22 @@ intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
 
     return ret;
 }
+intervalo_t newPower(intervalo_t interval, int p) {
+    intervalo_t result;
+
+    if (p == 0) {
+        result.min = 1;
+        result.max = 1;
+    } else {
+        result.min = interval.min;
+        result.max = interval.max;
+        for (int i = 1; i < p; i++) {
+            result = multiplica(result, interval);
+        }
+    }
+
+    return result;
+}
 
 intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, long long int k) {
     intervalo_t aux, fx;
@@ -224,13 +240,14 @@ intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, long long int k
         fx.max = 0;
         fx.min = 0;
         for (int j = 0; j < matriz->tam; j++) {
-            fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
+            fx = soma(fx, multiplica(matriz->X[j], newPower(aux, j)));
         }
         transformaIntervalo(&aux, xy[i].y);
         ret[i] = subtracao(aux, fx);
     }
     return ret;
 }
+
 
 void libera(matriz_t *matriz, intervalo_t *residuo) {
     for (int i = 0; i < matriz->tam; i++) {
