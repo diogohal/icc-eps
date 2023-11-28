@@ -48,7 +48,7 @@ int main() {
     printf("\n");
 
     start = timestamp();
-    intervalo_t *residuo = calculaResiduo(SL, pontos, k);
+    intervalo_t *residuo = calculaResiduoNaive(SL, pontos, k);
     stop = timestamp();
     tResiduo = stop - start;
     // for (int i = 0; i < k; i++) {
