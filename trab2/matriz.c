@@ -175,79 +175,6 @@ void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
 
 }
 
-// Calcula o resíduo de uma matriz
-// intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
-//     intervalo_t aux, fx;
-//     intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
-//     if (!ret) return NULL;
-
-//     long long int istart = 0;
-//     long long int iend = 0;
-
-//     for(long long int ii = 0; ii < k/BF; ii++){
-//         istart = ii * BF;
-//         iend = istart + BF;
-
-//         for (long long int i = istart; i < iend; i++) {
-//             transformaIntervalo(&aux, xy[i].x);
-//             fx.max = 0;
-//             fx.min = 0;
-//             for (int j = 0; j < matriz->tam; j++) {
-//                 fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
-//             }
-//             transformaIntervalo(&aux, xy[i].y);
-//             ret[i] = subtracao(aux, fx);
-//         }
-//     }
-
-//     for (long long int i = iend; i < k; i++) {
-//         transformaIntervalo(&aux, xy[i].x);
-//         fx.max = 0;
-//         fx.min = 0;
-//         for (int j = 0; j < matriz->tam; j++) {
-//             fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
-//         }
-//         transformaIntervalo(&aux, xy[i].y);
-//         ret[i] = subtracao(aux, fx);
-//     }
-
-//     return ret;
-// }
-intervalo_t newPower(intervalo_t interval, int p) {
-    intervalo_t result;
-
-    if (p == 0) {
-        result.min = 1;
-        result.max = 1;
-    } else {
-        result.min = interval.min;
-        result.max = interval.max;
-        for (int i = 1; i < p; i++) {
-            result = multiplica(result, interval);
-        }
-    }
-
-    return result;
-}
-
-intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
-    intervalo_t aux, fx;
-    intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
-    if (!ret) return NULL;
-
-    for (long long int i = 0; i < k; i++) {
-        transformaIntervalo(&aux, xy[i].x);
-        fx.max = 0;
-        fx.min = 0;
-        for (int j = 0; j < matriz->tam; j++) {
-            fx = soma(fx, multiplica(matriz->X[j], newPower(aux, j)));
-        }
-        transformaIntervalo(&aux, xy[i].y);
-        ret[i] = subtracao(aux, fx);
-    }
-    return ret;
-}
-
 intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, long long int k) {
     intervalo_t aux, fx;
     intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
@@ -259,6 +186,35 @@ intervalo_t *calculaResiduoNaive(matriz_t *matriz, pontos_t *xy, long long int k
         fx.min = 0;
         for (int j = 0; j < matriz->tam; j++) {
             fx = soma(fx, multiplica(matriz->X[j], power(aux, j)));
+        }
+        transformaIntervalo(&aux, xy[i].y);
+        ret[i] = subtracao(aux, fx);
+    }
+    return ret;
+}
+
+intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
+    intervalo_t aux, fx, power;
+    intervalo_t *ret = malloc(sizeof(intervalo_t) * k);
+    if (!ret) return NULL;
+
+    for (long long int i = 0; i < k; i++) {
+        transformaIntervalo(&aux, xy[i].x);
+        fx.max = 0;
+        fx.min = 0;
+        for (int j = 0; j < matriz->tam; j++) {
+            if(j == 0){
+                power.max = 1.0;
+                power.min = 1.0;
+                // fx = soma(fx, multiplica(matriz->X[j], power));
+            } else if(j == 1){
+                power.max = aux.max;
+                power.min = aux.min;
+                // fx = soma(fx, multiplica(matriz->X[j], power));
+            } else {
+                power = multiplica(power, aux);
+            }
+            fx = soma(fx, multiplica(matriz->X[j], power));
         }
         transformaIntervalo(&aux, xy[i].y);
         ret[i] = subtracao(aux, fx);
