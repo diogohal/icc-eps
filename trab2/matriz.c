@@ -133,6 +133,49 @@ void criaSLNaive(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
     }
 }
 
+// void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
+//     intervalo_t aux;
+//     intervalo_t aux2;
+//     long long int sumstart = 0;
+//     long long int sumend = 0;
+
+//     for(long long int sumsum = 0; sumsum < k/BF; sumsum++){
+//         sumstart = sumsum * BF;
+//         sumend = sumstart + BF;
+
+//         for (long long int sum = sumstart; sum < sumend; sum++) {
+//             transformaIntervalo(&aux, xy[sum].x);
+
+//             for (long long int i = 0; i < n + 1; i++) {
+//                 intervalo_t power_i = power(aux, i);
+
+//                 for (long long int j = 0; j < n + 1; j++) {
+//                     SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+//                 }
+
+//                 transformaIntervalo(&aux2, xy[sum].y);
+//                 SL->B[i] = soma(SL->B[i], multiplica(aux2, power_i));
+//             }
+//         }
+//     }
+//     for (long long int sum = sumend; sum < k; sum++) {
+//         transformaIntervalo(&aux, xy[sum].x);
+
+//         for (long long int i = 0; i < n + 1; i++) {
+//             intervalo_t power_i = power(aux, i);
+
+//             for (long long int j = 0; j < n + 1; j++) {
+//                 SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+//             }
+
+//             transformaIntervalo(&aux2, xy[sum].y);
+//             SL->B[i] = soma(SL->B[i], multiplica(aux2, power_i));
+//         }
+//     }
+
+// }
+
+
 void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
     intervalo_t aux;
     intervalo_t aux2;
@@ -147,10 +190,29 @@ void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
             transformaIntervalo(&aux, xy[sum].x);
 
             for (long long int i = 0; i < n + 1; i++) {
-                intervalo_t power_i = power(aux, i);
+                intervalo_t power_i;
+                if(i == 0){
+                    power_i.max = 1.0;
+                    power_i.min = 1.0;
+                } else if(i == 1){
+                    power_i.max = aux.max;
+                    power_i.min = aux.min;
+                } else {
+                    power_i = multiplica(power_i, aux);
+                }
 
                 for (long long int j = 0; j < n + 1; j++) {
-                    SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+                    intervalo_t power_j;
+                    if(j == 0){
+                        power_j.max = 1.0;
+                        power_j.min = 1.0;
+                    } else if(j == 1){
+                        power_j.max = aux.max;
+                        power_j.min = aux.min;
+                    } else {
+                        power_j = multiplica(power_j, aux);
+                    }
+                    SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power_j));
                 }
 
                 transformaIntervalo(&aux2, xy[sum].y);
@@ -162,10 +224,29 @@ void criaSL(pontos_t *xy, matriz_t *SL, long long int k, long long int n) {
         transformaIntervalo(&aux, xy[sum].x);
 
         for (long long int i = 0; i < n + 1; i++) {
-            intervalo_t power_i = power(aux, i);
+            intervalo_t power_i;
+            if(i == 0){
+                power_i.max = 1.0;
+                power_i.min = 1.0;
+            } else if(i == 1){
+                power_i.max = aux.max;
+                power_i.min = aux.min;
+            } else {
+                power_i = multiplica(power_i, aux);
+            }
 
             for (long long int j = 0; j < n + 1; j++) {
-                SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power(aux, j)));
+                intervalo_t power_j;
+                if(j == 0){
+                    power_j.max = 1.0;
+                    power_j.min = 1.0;
+                } else if(j == 1){
+                    power_j.max = aux.max;
+                    power_j.min = aux.min;
+                } else {
+                    power_j = multiplica(power_j, aux);
+                }
+                SL->A[i][j] = soma(SL->A[i][j], multiplica(power_i, power_j));
             }
 
             transformaIntervalo(&aux2, xy[sum].y);
@@ -206,11 +287,9 @@ intervalo_t *calculaResiduo(matriz_t *matriz, pontos_t *xy, long long int k) {
             if(j == 0){
                 power.max = 1.0;
                 power.min = 1.0;
-                // fx = soma(fx, multiplica(matriz->X[j], power));
             } else if(j == 1){
                 power.max = aux.max;
                 power.min = aux.min;
-                // fx = soma(fx, multiplica(matriz->X[j], power));
             } else {
                 power = multiplica(power, aux);
             }

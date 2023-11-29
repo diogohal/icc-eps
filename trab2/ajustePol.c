@@ -55,9 +55,9 @@ int main() {
     //     printaIntervalo(&residuo[i]);
     //     printf(" ");
     // }
-    printf("\n%f\n", tResiduo);
+    // printf("\n%f\n", tResiduo);
 
-    // printf("\n%f\n", tgeraSL);
+    printf("\n%f\n", tgeraSL);
     // printf("%f\n", tsolSL);
     LIKWID_MARKER_CLOSE;
 
