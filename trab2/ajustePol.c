@@ -30,7 +30,7 @@ int main() {
     matriz_t *SL = criaMatriz(n + 1);
     start = timestamp();
     LIKWID_MARKER_START("geraSL");
-    criaSL(pontos, SL, k, n);
+    criaSLNaive(pontos, SL, k, n);
     LIKWID_MARKER_STOP("geraSL");
     stop = timestamp();
     tgeraSL = stop - start;
